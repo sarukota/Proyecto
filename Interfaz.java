@@ -76,9 +76,9 @@ public class Interfaz extends javax.swing.JFrame {
         returnVal = chooser.showOpenDialog(null);
         if(returnVal == JFileChooser.APPROVE_OPTION) {
            System.out.println("You chose to open this file: " +
-                chooser.getSelectedFile().getName());
+                chooser.getSelectedFile().getPath());
         }
-        return chooser.getSelectedFile().getName();
+        return chooser.getSelectedFile().getPath();
     }
 
     /**
@@ -132,6 +132,7 @@ public class Interfaz extends javax.swing.JFrame {
         btnGuardarCliente = new javax.swing.JButton();
         pnlPlano = new javax.swing.JPanel();
         btnImportarMapa = new javax.swing.JButton();
+        jPanel1 = new javax.swing.JPanel();
         lblImagen = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -339,7 +340,7 @@ public class Interfaz extends javax.swing.JFrame {
                         .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(tfNacionalidad)
                             .addComponent(tfApellido1)
-                            .addComponent(dcFechaNac, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE))))
+                            .addComponent(dcFechaNac, javax.swing.GroupLayout.DEFAULT_SIZE, 722, Short.MAX_VALUE))))
                 .addGap(23, 23, 23))
             .addGroup(pnlCliente1Layout.createSequentialGroup()
                 .addGap(145, 145, 145)
@@ -409,28 +410,40 @@ public class Interfaz extends javax.swing.JFrame {
             }
         });
 
+        jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(lblImagen, javax.swing.GroupLayout.DEFAULT_SIZE, 558, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(lblImagen, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
         javax.swing.GroupLayout pnlPlanoLayout = new javax.swing.GroupLayout(pnlPlano);
         pnlPlano.setLayout(pnlPlanoLayout);
         pnlPlanoLayout.setHorizontalGroup(
             pnlPlanoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlPlanoLayout.createSequentialGroup()
-                .addGap(30, 30, 30)
-                .addComponent(btnImportarMapa)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 228, Short.MAX_VALUE)
-                .addComponent(lblImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(62, 62, 62))
+            .addGroup(pnlPlanoLayout.createSequentialGroup()
+                .addGap(17, 17, 17)
+                .addGroup(pnlPlanoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(btnImportarMapa)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(745, Short.MAX_VALUE))
         );
         pnlPlanoLayout.setVerticalGroup(
             pnlPlanoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlPlanoLayout.createSequentialGroup()
-                .addGroup(pnlPlanoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlPlanoLayout.createSequentialGroup()
-                        .addGap(34, 34, 34)
-                        .addComponent(btnImportarMapa))
-                    .addGroup(pnlPlanoLayout.createSequentialGroup()
-                        .addGap(49, 49, 49)
-                        .addComponent(lblImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap(113, Short.MAX_VALUE))
+                .addGap(28, 28, 28)
+                .addComponent(btnImportarMapa)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         pestanias.addTab("Plano del área", pnlPlano);
@@ -508,11 +521,14 @@ public class Interfaz extends javax.swing.JFrame {
 
     private void btnImportarMapaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportarMapaActionPerformed
         // TODO add your handling code here:
-
-            ImageIcon icono = new ImageIcon(seleccionArchivo());
+        //Coloca la imagen seleccionada con el metodo seleccionArchivo en una etiqueta
+        String pathMapa = seleccionArchivo();
+        ImageIcon icono = new ImageIcon(pathMapa);
         if (icono.getImageLoadStatus() == java.awt.MediaTracker.COMPLETE) {
             lblImagen.setText("");
             lblImagen.setIcon(icono); // Se coloca en el JLabel
+        }else{
+            System.err.println("Ha ocurrido un error");
         }
     }//GEN-LAST:event_btnImportarMapaActionPerformed
 
@@ -561,6 +577,7 @@ public class Interfaz extends javax.swing.JFrame {
     private com.toedter.calendar.JDateChooser dcCheckIn;
     private com.toedter.calendar.JDateChooser dcCheckOut;
     private com.toedter.calendar.JDateChooser dcFechaNac;
+    private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblApellido1;
     private javax.swing.JLabel lblApellido2;
     private javax.swing.JLabel lblCheckIn;

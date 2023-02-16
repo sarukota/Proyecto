@@ -4,9 +4,15 @@
  */
 package com.mycompany.proyectosaracoello;
 
+import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
-import javax.swing.JTabbedPane;
+import javafx.stage.FileChooser;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
 /**
  *
@@ -19,6 +25,60 @@ public class Interfaz extends javax.swing.JFrame {
      */
     public Interfaz() {
         initComponents();
+    }
+    
+    public Vehiculo crearVehiculo(){
+        //Al pulsa boton guardar en vehiculo, se instancia un nuevo vehículo con los datos de los campos
+        Vehiculo vehiculo = new Vehiculo();
+        Parcela parcela = new Parcela();
+     
+        parcela.setNumParcela(cbParcela.getSelectedIndex());
+        parcela.setConLuz(cbLuz.isSelected());
+        parcela.setDisponible(false);
+        
+        vehiculo.setMatricula(tfMatricula.getText());
+        vehiculo.setMarca(tfMarca.getText());
+        vehiculo.setModelo(tfModelo.getText());
+        vehiculo.setLuz(cbLuz.isSelected());
+        vehiculo.setCheck_in(dcCheckIn.getDate());
+        vehiculo.setCheck_out(dcCheckOut.getDate());
+        vehiculo.setNumOcupantes(cbOcupantes.getSelectedIndex());
+        vehiculo.setParcela(parcela);
+            
+        //Sustituir esta linea por la subida a la BBDD
+        
+        return vehiculo;
+    }
+    
+    public Cliente crearCliente(){
+        
+        Cliente cliente = new Cliente();
+        
+        cliente.setDni(tfDNI.getText());
+        cliente.setNacionalidad(tfNacionalidad.getText());
+        cliente.setNombre(tfNombre.getText());
+        cliente.setApellido1(tfApellido1.getText());
+        cliente.setApellido2(tfApellido2.getText());
+        cliente.setFecha_nacimiento(dcFechaNac.getDate());
+        cliente.setProvincia(tfProvincia.getText());
+        cliente.setTelefono(Integer.valueOf (tfTelefono.getText()));
+        cliente.setMail(tfMail.getText());
+                
+        return cliente;
+    }
+    
+    public String seleccionArchivo(){
+        //Código para abrir una ventana FileChooser, lo cojo de la Api de Java
+        JFileChooser chooser = new JFileChooser();
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG & GIF Images", "jpg", "gif");
+        chooser.setFileFilter(filter);
+        int returnVal;
+        returnVal = chooser.showOpenDialog(null);
+        if(returnVal == JFileChooser.APPROVE_OPTION) {
+           System.out.println("You chose to open this file: " +
+                chooser.getSelectedFile().getName());
+        }
+        return chooser.getSelectedFile().getName();
     }
 
     /**
@@ -70,6 +130,9 @@ public class Interfaz extends javax.swing.JFrame {
         lblMail = new javax.swing.JLabel();
         tfMail = new javax.swing.JTextField();
         btnGuardarCliente = new javax.swing.JButton();
+        pnlPlano = new javax.swing.JPanel();
+        btnImportarMapa = new javax.swing.JButton();
+        lblImagen = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(new java.awt.Dimension(600, 400));
@@ -104,11 +167,12 @@ public class Interfaz extends javax.swing.JFrame {
 
         lblParcela.setText("Parcela:");
 
-        if (cbLuz.isSelected()){
+        cbParcela.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
+        /*if (cbLuz.isSelected()){
             cbParcela.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6" }));
         }else{
             cbParcela.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
-        }
+        }*/
 
         cbParcela.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -338,6 +402,39 @@ public class Interfaz extends javax.swing.JFrame {
 
         pestanias.addTab("Registro de usuarios", pnlRegistroUsuarios);
 
+        btnImportarMapa.setText("Importar mapa");
+        btnImportarMapa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnImportarMapaActionPerformed(evt);
+            }
+        });
+
+        javax.swing.GroupLayout pnlPlanoLayout = new javax.swing.GroupLayout(pnlPlano);
+        pnlPlano.setLayout(pnlPlanoLayout);
+        pnlPlanoLayout.setHorizontalGroup(
+            pnlPlanoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlPlanoLayout.createSequentialGroup()
+                .addGap(30, 30, 30)
+                .addComponent(btnImportarMapa)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 228, Short.MAX_VALUE)
+                .addComponent(lblImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(62, 62, 62))
+        );
+        pnlPlanoLayout.setVerticalGroup(
+            pnlPlanoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlPlanoLayout.createSequentialGroup()
+                .addGroup(pnlPlanoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlPlanoLayout.createSequentialGroup()
+                        .addGap(34, 34, 34)
+                        .addComponent(btnImportarMapa))
+                    .addGroup(pnlPlanoLayout.createSequentialGroup()
+                        .addGap(49, 49, 49)
+                        .addComponent(lblImagen, javax.swing.GroupLayout.PREFERRED_SIZE, 224, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(113, Short.MAX_VALUE))
+        );
+
+        pestanias.addTab("Plano del área", pnlPlano);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -358,25 +455,18 @@ public class Interfaz extends javax.swing.JFrame {
 
     private void btnGuardarVehiculoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarVehiculoActionPerformed
         // TODO add your handling code here:
-        //Al pulsa boton guardar en vehiculo, se instancia un nuevo vehículo con los datos de los campos
-        Vehiculo vehiculo = new Vehiculo();
-        Parcela parcela = new Parcela();
-        //private JTabbedPane cliente = new JTabbedPane();
+        Vehiculo vehiculo = crearVehiculo();
+        System.out.println(vehiculo.toString()); 
         
-        parcela.setNumParcela(cbParcela.getSelectedIndex());
-        parcela.setConLuz(cbLuz.isSelected());
-        parcela.setDisponible(false);
-        
-        vehiculo.setMatricula(tfMatricula.getText());
-        vehiculo.setMarca(tfMarca.getText());
-        vehiculo.setModelo(tfModelo.getText());
-        vehiculo.setLuz(cbLuz.isSelected());
-        vehiculo.setCheck_in(dcCheckIn.getDate());
-        vehiculo.setCheck_out(dcCheckOut.getDate());
-        vehiculo.setNumOcupantes(cbOcupantes.getSelectedIndex());
-        vehiculo.setParcela(parcela);
-            
-        System.out.println(vehiculo.toString());
+        //Limpio todos los campos de la interfaz
+        tfMatricula.setText(null);
+        tfMarca.setText(null);
+        tfModelo.setText(null);
+        cbLuz.setSelected(false);
+        dcCheckIn.setDate(null);
+        dcCheckOut.setDate(null);
+        cbOcupantes.setSelectedIndex(0);
+        cbParcela.setSelectedIndex(0);
         
     }//GEN-LAST:event_btnGuardarVehiculoActionPerformed
 
@@ -397,23 +487,13 @@ public class Interfaz extends javax.swing.JFrame {
         //Al pulsa boton guardar en cliente, se instancia un nuevo cliente con los datos de los campos,
         //se añade al set ClientesEnVehiculo y este nuevo set se añade al objeto vehículo
         
-        Cliente cliente = new Cliente();
-        
+        Cliente cliente1 = crearCliente();
+        System.out.println(cliente1.toString());
         Set<Cliente>clientesEnVehiculo = new HashSet<Cliente>();
-        
-        cliente.setDni(tfDNI.getText());
-        cliente.setNacionalidad(tfNacionalidad.getText());
-        cliente.setNombre(tfNombre.getText());
-        cliente.setApellido1(tfApellido1.getText());
-        cliente.setApellido2(tfApellido2.getText());
-        cliente.setFecha_nacimiento(dcFechaNac.getDate());
-        cliente.setProvincia(tfProvincia.getText());
-        cliente.setTelefono(Integer.valueOf (tfTelefono.getText()));
-        cliente.setMail(tfMail.getText());
-        
-        clientesEnVehiculo.add(cliente);
+        clientesEnVehiculo.add(cliente1);
         System.out.println(clientesEnVehiculo.toString());
         
+        //Limpio todos los campos de la interfaz
         tfDNI.setText(null);
         tfNacionalidad.setText(null);
         tfNombre.setText(null);
@@ -425,6 +505,16 @@ public class Interfaz extends javax.swing.JFrame {
         tfMail.setText(null);
         
     }//GEN-LAST:event_btnGuardarClienteActionPerformed
+
+    private void btnImportarMapaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportarMapaActionPerformed
+        // TODO add your handling code here:
+
+            ImageIcon icono = new ImageIcon(seleccionArchivo());
+        if (icono.getImageLoadStatus() == java.awt.MediaTracker.COMPLETE) {
+            lblImagen.setText("");
+            lblImagen.setIcon(icono); // Se coloca en el JLabel
+        }
+    }//GEN-LAST:event_btnImportarMapaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -464,6 +554,7 @@ public class Interfaz extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGuardarCliente;
     private javax.swing.JButton btnGuardarVehiculo;
+    private javax.swing.JButton btnImportarMapa;
     private javax.swing.JCheckBox cbLuz;
     private javax.swing.JComboBox<String> cbOcupantes;
     private javax.swing.JComboBox<String> cbParcela;
@@ -476,6 +567,7 @@ public class Interfaz extends javax.swing.JFrame {
     private javax.swing.JLabel lblCheckOut;
     private javax.swing.JLabel lblDNI;
     private javax.swing.JLabel lblFechaNac;
+    private javax.swing.JLabel lblImagen;
     private javax.swing.JLabel lblMail;
     private javax.swing.JLabel lblMarca;
     private javax.swing.JLabel lblMatricula;
@@ -489,6 +581,7 @@ public class Interfaz extends javax.swing.JFrame {
     private javax.swing.JTabbedPane pestanias;
     private javax.swing.JPanel pnlCliente1;
     private javax.swing.JTabbedPane pnlClientes;
+    private javax.swing.JPanel pnlPlano;
     private javax.swing.JPanel pnlRegistroUsuarios;
     private javax.swing.JPanel pnlVehiculos;
     private javax.swing.JTextField tfApellido1;

@@ -4,15 +4,12 @@
  */
 package com.mycompany.proyectosaracoello;
 
-import java.io.File;
+import java.awt.Image;
 import java.util.HashSet;
 import java.util.Set;
-import javafx.stage.FileChooser;
-import javax.swing.ImageIcon;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JPopupMenu;
+import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
 
 /**
  *
@@ -67,18 +64,28 @@ public class Interfaz extends javax.swing.JFrame {
         return cliente;
     }
     
-    public String seleccionArchivo(){
-        //Código para abrir una ventana FileChooser, lo cojo de la Api de Java
-        JFileChooser chooser = new JFileChooser();
+    //Método para seleccionar la ruta absoluta de un archivo de imagen con un JFileChooser
+    public String seleccionarImagen(){
+        JFileChooser chooser = new JFileChooser(); //Declaro el FileChooser
         FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG & GIF Images", "jpg", "gif");
-        chooser.setFileFilter(filter);
-        int returnVal;
-        returnVal = chooser.showOpenDialog(null);
-        if(returnVal == JFileChooser.APPROVE_OPTION) {
-           System.out.println("You chose to open this file: " +
-                chooser.getSelectedFile().getPath());
+        chooser.setFileFilter(filter); //Pongo un filtro para la extensión de los archivos
+        int returnVal = chooser.showOpenDialog(null); //Se abre la ventana de FileChooser
+        if(returnVal == JFileChooser.APPROVE_OPTION) { //Si se presiona el botón aceptar
+           System.out.println("You chose to open this file: " + chooser.getSelectedFile().getPath());
         }
         return chooser.getSelectedFile().getPath();
+    }
+    
+    //Metodo para insertar una imagen en un Jlabel
+    public void insertarImagen (JLabel labelFondo, String ruta){ 
+        ImageIcon imagen = new ImageIcon(ruta); //obtengo una imagen de la ruta específica
+        ImageIcon imagenEscala = new ImageIcon(imagen.getImage().getScaledInstance(labelFondo.getWidth(), labelFondo.getHeight(), Image.SCALE_DEFAULT)); //para ajustar imagen al tamaño del label
+        if (imagenEscala.getImageLoadStatus() == java.awt.MediaTracker.COMPLETE) {
+            labelFondo.setText("");
+            labelFondo.setIcon(imagenEscala); // Se coloca en el JLabel
+        }else{
+            System.err.println("Ha ocurrido un error");
+        }
     }
 
     /**
@@ -132,10 +139,11 @@ public class Interfaz extends javax.swing.JFrame {
         btnGuardarCliente = new javax.swing.JButton();
         pnlPlano = new javax.swing.JPanel();
         btnImportarMapa = new javax.swing.JButton();
-        jPanel1 = new javax.swing.JPanel();
         lblImagen = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("FurgoGestion");
+        setAlwaysOnTop(true);
         setPreferredSize(new java.awt.Dimension(600, 400));
         setSize(new java.awt.Dimension(600, 400));
 
@@ -311,36 +319,40 @@ public class Interfaz extends javax.swing.JFrame {
                         .addComponent(tfTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
                         .addComponent(lblMail)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 495, Short.MAX_VALUE)
                         .addComponent(tfMail, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(pnlCliente1Layout.createSequentialGroup()
-                        .addComponent(lblProvincia)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(tfProvincia))
-                    .addGroup(pnlCliente1Layout.createSequentialGroup()
-                        .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(pnlCliente1Layout.createSequentialGroup()
-                                .addComponent(lblApellido2)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(tfApellido2))
-                            .addGroup(pnlCliente1Layout.createSequentialGroup()
-                                .addComponent(lblNombre)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(tfNombre))
-                            .addGroup(pnlCliente1Layout.createSequentialGroup()
-                                .addComponent(lblDNI)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(tfDNI, javax.swing.GroupLayout.PREFERRED_SIZE, 98, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(24, 24, 24)
                         .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblNacionalidad)
-                            .addComponent(lblApellido1)
-                            .addComponent(lblFechaNac))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(tfNacionalidad)
-                            .addComponent(tfApellido1)
-                            .addComponent(dcFechaNac, javax.swing.GroupLayout.DEFAULT_SIZE, 722, Short.MAX_VALUE))))
+                            .addGroup(pnlCliente1Layout.createSequentialGroup()
+                                .addComponent(lblProvincia)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(tfProvincia, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(pnlCliente1Layout.createSequentialGroup()
+                                .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(pnlCliente1Layout.createSequentialGroup()
+                                        .addComponent(lblDNI)
+                                        .addGap(26, 26, 26)
+                                        .addComponent(tfDNI, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlCliente1Layout.createSequentialGroup()
+                                            .addComponent(lblApellido2)
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                            .addComponent(tfApellido2, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlCliente1Layout.createSequentialGroup()
+                                            .addComponent(lblNombre)
+                                            .addGap(18, 18, 18)
+                                            .addComponent(tfNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                .addGap(113, 113, 113)
+                                .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lblNacionalidad)
+                                    .addComponent(lblApellido1)
+                                    .addComponent(lblFechaNac))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(tfNacionalidad, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(tfApellido1)
+                                    .addComponent(dcFechaNac, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addGap(23, 23, 23))
             .addGroup(pnlCliente1Layout.createSequentialGroup()
                 .addGap(145, 145, 145)
@@ -351,24 +363,31 @@ public class Interfaz extends javax.swing.JFrame {
             pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlCliente1Layout.createSequentialGroup()
                 .addGap(30, 30, 30)
-                .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblDNI)
-                    .addComponent(tfDNI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblNacionalidad)
-                    .addComponent(tfNacionalidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblNombre)
-                    .addComponent(tfNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblApellido1)
-                    .addComponent(tfApellido1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
                 .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(lblApellido2)
-                        .addComponent(tfApellido2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(lblFechaNac))
-                    .addComponent(dcFechaNac, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(pnlCliente1Layout.createSequentialGroup()
+                        .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblDNI)
+                            .addComponent(tfDNI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblNombre)
+                            .addComponent(tfNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblApellido2)
+                            .addComponent(tfApellido2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(pnlCliente1Layout.createSequentialGroup()
+                        .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblNacionalidad)
+                            .addComponent(tfNacionalidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblApellido1)
+                            .addComponent(tfApellido1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(lblFechaNac)
+                            .addComponent(dcFechaNac, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(18, 18, 18)
                 .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblProvincia)
@@ -379,7 +398,7 @@ public class Interfaz extends javax.swing.JFrame {
                     .addComponent(tfTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblMail)
                     .addComponent(tfMail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 74, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 297, Short.MAX_VALUE)
                 .addComponent(btnGuardarCliente)
                 .addGap(33, 33, 33))
         );
@@ -398,7 +417,7 @@ public class Interfaz extends javax.swing.JFrame {
         pnlRegistroUsuariosLayout.setVerticalGroup(
             pnlRegistroUsuariosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(pnlVehiculos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(pnlClientes)
+            .addComponent(pnlClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
         );
 
         pestanias.addTab("Registro de usuarios", pnlRegistroUsuarios);
@@ -410,20 +429,7 @@ public class Interfaz extends javax.swing.JFrame {
             }
         });
 
-        jPanel1.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(lblImagen, javax.swing.GroupLayout.DEFAULT_SIZE, 558, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addComponent(lblImagen, javax.swing.GroupLayout.DEFAULT_SIZE, 308, Short.MAX_VALUE)
-                .addContainerGap())
-        );
+        lblImagen.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
 
         javax.swing.GroupLayout pnlPlanoLayout = new javax.swing.GroupLayout(pnlPlano);
         pnlPlano.setLayout(pnlPlanoLayout);
@@ -433,17 +439,17 @@ public class Interfaz extends javax.swing.JFrame {
                 .addGap(17, 17, 17)
                 .addGroup(pnlPlanoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(btnImportarMapa)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(745, Short.MAX_VALUE))
+                    .addComponent(lblImagen, javax.swing.GroupLayout.DEFAULT_SIZE, 734, Short.MAX_VALUE))
+                .addContainerGap(433, Short.MAX_VALUE))
         );
         pnlPlanoLayout.setVerticalGroup(
             pnlPlanoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pnlPlanoLayout.createSequentialGroup()
-                .addGap(28, 28, 28)
-                .addComponent(btnImportarMapa)
+                .addGap(20, 20, 20)
+                .addComponent(btnImportarMapa, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(lblImagen, javax.swing.GroupLayout.DEFAULT_SIZE, 416, Short.MAX_VALUE)
+                .addContainerGap(131, Short.MAX_VALUE))
         );
 
         pestanias.addTab("Plano del área", pnlPlano);
@@ -459,7 +465,8 @@ public class Interfaz extends javax.swing.JFrame {
             .addComponent(pestanias)
         );
 
-        pack();
+        setSize(new java.awt.Dimension(1200, 650));
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void cbOcupantesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbOcupantesActionPerformed
@@ -521,15 +528,10 @@ public class Interfaz extends javax.swing.JFrame {
 
     private void btnImportarMapaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportarMapaActionPerformed
         // TODO add your handling code here:
-        //Coloca la imagen seleccionada con el metodo seleccionArchivo en una etiqueta
-        String pathMapa = seleccionArchivo();
-        ImageIcon icono = new ImageIcon(pathMapa);
-        if (icono.getImageLoadStatus() == java.awt.MediaTracker.COMPLETE) {
-            lblImagen.setText("");
-            lblImagen.setIcon(icono); // Se coloca en el JLabel
-        }else{
-            System.err.println("Ha ocurrido un error");
-        }
+        //Coloca la imagen seleccionada con el metodo seleccionarImagen en una etiqueta
+        String pathMapa = seleccionarImagen(); //Guardo la ruta del archivo
+        //this.setLocationRelativeTo(this); Para iniciar programa en el centro de la pantalla
+        insertarImagen (lblImagen, pathMapa);
     }//GEN-LAST:event_btnImportarMapaActionPerformed
 
     /**
@@ -577,7 +579,6 @@ public class Interfaz extends javax.swing.JFrame {
     private com.toedter.calendar.JDateChooser dcCheckIn;
     private com.toedter.calendar.JDateChooser dcCheckOut;
     private com.toedter.calendar.JDateChooser dcFechaNac;
-    private javax.swing.JPanel jPanel1;
     private javax.swing.JLabel lblApellido1;
     private javax.swing.JLabel lblApellido2;
     private javax.swing.JLabel lblCheckIn;

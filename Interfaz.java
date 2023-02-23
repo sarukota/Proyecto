@@ -2,13 +2,20 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
-package com.mycompany.proyectosaracoello;
+package clasesJava;
+
 
 import java.awt.Image;
+import java.sql.SQLException;
 import java.util.HashSet;
 import java.util.Set;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
+import org.hibernate.cfg.Configuration;
 
 
 /**
@@ -23,6 +30,21 @@ public class Interfaz extends javax.swing.JFrame {
     public Interfaz() {
         initComponents();
     }
+    
+    //Metodo para guardar datos a traves de hibernate
+    public void guardarDatosBD(Object objeto){
+        //Llevamos a cabo la configuracion de Hibernate
+	Configuration cfg = new Configuration().configure();
+	//unica instancia de sessionFactory
+	SessionFactory sessionFactory = cfg.buildSessionFactory(new StandardServiceRegistryBuilder().configure().build());
+	Session session = sessionFactory.openSession();
+        Transaction tx = session.beginTransaction();
+        session.save(objeto);
+        tx.commit();
+        session.close();
+        sessionFactory.close();
+    }
+        
     
     public Vehiculo crearVehiculo(){
         //Al pulsa boton guardar en vehiculo, se instancia un nuevo vehículo con los datos de los campos
@@ -41,8 +63,6 @@ public class Interfaz extends javax.swing.JFrame {
         vehiculo.setCheck_out(dcCheckOut.getDate());
         vehiculo.setNumOcupantes(cbOcupantes.getSelectedIndex());
         vehiculo.setParcela(parcela);
-            
-        //Sustituir esta linea por la subida a la BBDD
         
         return vehiculo;
     }
@@ -67,7 +87,7 @@ public class Interfaz extends javax.swing.JFrame {
     //Método para seleccionar la ruta absoluta de un archivo de imagen con un JFileChooser
     public String seleccionarImagen(){
         JFileChooser chooser = new JFileChooser(); //Declaro el FileChooser
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG & GIF Images", "jpg", "gif");
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG, GIF & PNG Images", "jpg", "gif", "png");
         chooser.setFileFilter(filter); //Pongo un filtro para la extensión de los archivos
         int returnVal = chooser.showOpenDialog(null); //Se abre la ventana de FileChooser
         if(returnVal == JFileChooser.APPROVE_OPTION) { //Si se presiona el botón aceptar
@@ -143,8 +163,6 @@ public class Interfaz extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("FurgoGestion");
-        setAlwaysOnTop(true);
-        setPreferredSize(new java.awt.Dimension(600, 400));
         setSize(new java.awt.Dimension(600, 400));
 
         lblMatricula.setText("Matrícula:");
@@ -190,7 +208,7 @@ public class Interfaz extends javax.swing.JFrame {
         });
 
         btnGuardarVehiculo.setText("Guardar");
-        btnGuardarVehiculo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnGuardarVehiculo.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btnGuardarVehiculo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnGuardarVehiculoActionPerformed(evt);
@@ -299,7 +317,7 @@ public class Interfaz extends javax.swing.JFrame {
         lblMail.setText("E-Mail:");
 
         btnGuardarCliente.setText("Guardar");
-        btnGuardarCliente.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnGuardarCliente.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btnGuardarCliente.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnGuardarClienteActionPerformed(evt);
@@ -333,15 +351,14 @@ public class Interfaz extends javax.swing.JFrame {
                                         .addComponent(lblDNI)
                                         .addGap(26, 26, 26)
                                         .addComponent(tfDNI, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlCliente1Layout.createSequentialGroup()
-                                            .addComponent(lblApellido2)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                            .addComponent(tfApellido2, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pnlCliente1Layout.createSequentialGroup()
-                                            .addComponent(lblNombre)
-                                            .addGap(18, 18, 18)
-                                            .addComponent(tfNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                    .addGroup(pnlCliente1Layout.createSequentialGroup()
+                                        .addComponent(lblApellido2)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(tfApellido2, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(pnlCliente1Layout.createSequentialGroup()
+                                        .addComponent(lblNombre)
+                                        .addGap(18, 18, 18)
+                                        .addComponent(tfNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                 .addGap(113, 113, 113)
                                 .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(lblNacionalidad)
@@ -417,7 +434,7 @@ public class Interfaz extends javax.swing.JFrame {
         pnlRegistroUsuariosLayout.setVerticalGroup(
             pnlRegistroUsuariosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(pnlVehiculos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(pnlClientes, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+            .addComponent(pnlClientes, javax.swing.GroupLayout.DEFAULT_SIZE, 611, Short.MAX_VALUE)
         );
 
         pestanias.addTab("Registro de usuarios", pnlRegistroUsuarios);
@@ -476,6 +493,7 @@ public class Interfaz extends javax.swing.JFrame {
     private void btnGuardarVehiculoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarVehiculoActionPerformed
         // TODO add your handling code here:
         Vehiculo vehiculo = crearVehiculo();
+        guardarDatosBD(vehiculo);
         System.out.println(vehiculo.toString()); 
         
         //Limpio todos los campos de la interfaz
@@ -560,6 +578,15 @@ public class Interfaz extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(Interfaz.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        
+        ConexionBBDD connect = new ConexionBBDD();
+		try {
+			connect.crearTablas();
+                        System.out.println("Se ha conectado correctamente a la BD");
+		} catch (SQLException ex) {
+			System.err.println("No se ha podido conectar al servidor SQL");
+			ex.printStackTrace();
+		}
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -567,6 +594,7 @@ public class Interfaz extends javax.swing.JFrame {
                 new Interfaz().setVisible(true);
             }
         });
+        
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

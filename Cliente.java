@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.proyectosaracoello;
+package clasesJava;
 
 import java.util.Date;
 
@@ -15,7 +15,7 @@ public class Cliente {
     private String nombre;
     private String apellido1;
     private String apellido2;
-    private Date fecha_nacimiento;
+    private Date fechaNac;
     private String nacionalidad;
     private String provincia;
     private int telefono;
@@ -32,7 +32,7 @@ public class Cliente {
 		this.nombre = nombre;
 		this.apellido1 = apellido1;
 		this.apellido2 = apellido2;
-		this.fecha_nacimiento = fecha_nacimiento;
+		this.fechaNac = fecha_nacimiento;
 		this.nacionalidad = nacionalidad;
 		this.provincia = provincia;
 		this.telefono = telefono;
@@ -72,11 +72,11 @@ public class Cliente {
 	}
 	
 	public Date getFecha_nacimiento() {
-		return fecha_nacimiento;
+		return fechaNac;
 	}
 	
 	public void setFecha_nacimiento(Date fecha_nacimiento) {
-		this.fecha_nacimiento = fecha_nacimiento;
+		this.fechaNac = fecha_nacimiento;
 	}
 	
 	public String getNacionalidad() {
@@ -114,7 +114,7 @@ public class Cliente {
 	@Override
 	public String toString() {
 		return "Cliente [dni=" + dni + ", nombre=" + nombre + ", apellido1=" + apellido1 + ", apellido2=" + apellido2
-				+ ", fecha_nacimiento=" + fecha_nacimiento + ", nacionalidad=" + nacionalidad + ", provincia="
+				+ ", fecha_nacimiento=" + fechaNac + ", nacionalidad=" + nacionalidad + ", provincia="
 				+ provincia + ", telefono=" + telefono + ", mail=" + mail + "]";
 	}
 }

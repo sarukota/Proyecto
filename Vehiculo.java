@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.mycompany.proyectosaracoello;
+package clasesJava;
 
 import java.util.Date;
 import java.util.Set;
@@ -17,8 +17,8 @@ public class Vehiculo {
 	private String modelo;
 	private boolean luz;
 	private int numOcupantes;
-	private Date check_in;
-	private Date check_out;
+	private Date checkIn;
+	private Date checkOut;
 	private Parcela parcela;
 	private Set <Cliente> clientes;
 	
@@ -34,8 +34,8 @@ public class Vehiculo {
 		this.modelo = modelo;
 		this.luz = luz;
 		this.numOcupantes = numOcupantes;
-		this.check_in = check_in;
-		this.check_out = check_out;
+		this.checkIn = check_in;
+		this.checkOut = check_out;
 		this.parcela = parcela;
 		this.clientes = clientes;
 	}
@@ -81,19 +81,19 @@ public class Vehiculo {
 	}
 
 	public Date getCheck_in() {
-		return check_in;
+		return checkIn;
 	}
 
 	public void setCheck_in(Date check_in) {
-		this.check_in = check_in;
+		this.checkIn = check_in;
 	}
 
 	public Date getCheck_out() {
-		return check_out;
+		return checkOut;
 	}
 
 	public void setCheck_out(Date check_out) {
-		this.check_out = check_out;
+		this.checkOut = check_out;
 	}
 
 	public Parcela getParcela() {
@@ -115,7 +115,7 @@ public class Vehiculo {
 	@Override
 	public String toString() {
 		return "Vehiculo [matricula=" + matricula + ", marca=" + marca + ", modelo=" + modelo + ", luz=" + luz
-				+ ", numOcupantes=" + numOcupantes + ", check_in=" + check_in + ", check_out=" + check_out
+				+ ", numOcupantes=" + numOcupantes + ", check_in=" + checkIn + ", check_out=" + checkOut
 				+ ", parcela=" + parcela /*+ ", clientes=" + clientes.size() */+ "]";
 	}
 }

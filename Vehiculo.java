@@ -4,118 +4,119 @@
  */
 package clasesJava;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
+import static java.util.concurrent.TimeUnit.DAYS;
+import javax.swing.JOptionPane;
 
-/**
- *
- * @author sarac
- */
 public class Vehiculo {
     private String matricula;
-	private String marca;
-	private String modelo;
-	private boolean luz;
-	private int numOcupantes;
-	private Date checkIn;
-	private Date checkOut;
-	private Parcela parcela;
-	private Set <Cliente> clientes;
+    private String marca;
+    private String modelo;
+    private int numOcupantes;
+    private Date checkIn;
+    private Date checkOut;
+    private Parcela parcela;
+    private Set <Cliente> clientes;
 	
-	public Vehiculo() {
+    public Vehiculo() {
 		
-	}
-	
-	public Vehiculo(String matricula, String marca, String modelo, boolean luz, int numOcupantes, Date check_in,
-			Date check_out, Parcela parcela, Set<Cliente> clientes) {
-		super();
-		this.matricula = matricula;
-		this.marca = marca;
-		this.modelo = modelo;
-		this.luz = luz;
-		this.numOcupantes = numOcupantes;
-		this.checkIn = check_in;
-		this.checkOut = check_out;
-		this.parcela = parcela;
-		this.clientes = clientes;
-	}
+    }
 
-	public String getMatricula() {
-		return matricula;
-	}
+    public Vehiculo(String matricula, String marca, String modelo, int numOcupantes, Date checkIn, Date checkOut, Parcela parcela, Set<Cliente> clientes) {
+        this.matricula = matricula;
+        this.marca = marca;
+        this.modelo = modelo;
+        this.numOcupantes = numOcupantes;
+        this.checkIn = checkIn;
+        this.checkOut = checkOut;
+        this.parcela = parcela;
+        this.clientes = clientes;
+    }
 
-	public void setMatricula(String matricula) {
-		this.matricula = matricula;
-	}
+    public String getMatricula() {
+        return matricula;
+    }
 
-	public String getMarca() {
-		return marca;
-	}
+    public void setMatricula(String matricula) {
+        this.matricula = matricula;
+    }
 
-	public void setMarca(String marca) {
-		this.marca = marca;
-	}
+    public String getMarca() {
+        return marca;
+    }
 
-	public String getModelo() {
-		return modelo;
-	}
+    public void setMarca(String marca) {
+        this.marca = marca;
+    }
 
-	public void setModelo(String modelo) {
-		this.modelo = modelo;
-	}
+    public String getModelo() {
+        return modelo;
+    }
 
-	public boolean isLuz() {
-		return luz;
-	}
+    public void setModelo(String modelo) {
+        this.modelo = modelo;
+    }
 
-	public void setLuz(boolean luz) {
-		this.luz = luz;
-	}
+    public int getNumOcupantes() {
+        return numOcupantes;
+    }
 
-	public int getNumOcupantes() {
-		return numOcupantes;
-	}
+    public void setNumOcupantes(int numOcupantes) {
+        this.numOcupantes = numOcupantes;
+    }
 
-	public void setNumOcupantes(int numOcupantes) {
-		this.numOcupantes = numOcupantes;
-	}
+    public Date getCheckIn() {
+        return checkIn;
+    }
 
-	public Date getCheck_in() {
-		return checkIn;
-	}
+    public void setCheckIn(Date checkIn) {
+        this.checkIn = checkIn;
+    }
 
-	public void setCheck_in(Date check_in) {
-		this.checkIn = check_in;
-	}
+    public Date getCheckOut() {
+        return checkOut;
+    }
 
-	public Date getCheck_out() {
-		return checkOut;
-	}
+    public void setCheckOut(Date checkOut) {
+        this.checkOut = checkOut;
+    }
 
-	public void setCheck_out(Date check_out) {
-		this.checkOut = check_out;
-	}
+    public Parcela getParcela() {
+        return parcela;
+    }
 
-	public Parcela getParcela() {
-		return parcela;
-	}
+    public void setParcela(Parcela parcela) {
+        this.parcela = parcela;
+    }
 
-	public void setParcela(Parcela parcela) {
-		this.parcela = parcela;
-	}
+    public Set<Cliente> getClientes() {
+        return clientes;
+    }
 
-        public Set<Cliente> getClientes() {
-                return clientes;
-        }
-        
-        public void setClientes(Set<Cliente> clientes) {
-                this.clientes = clientes;
-        }
+    public void setClientes(Set<Cliente> clientes) {
+        this.clientes = clientes;
+    }
+    
+    private void calculoFactura(Area miArea){
+        DateFormat fechaCorta = new SimpleDateFormat ("dd-MM-aaaa");
+        Date fechaEmision = new Date(System.currentTimeMillis());
+        String factura = fechaCorta.format(fechaEmision) +"\n"
+                + "Entrada: "+fechaCorta.format(getCheckIn())+"      Salida: "+fechaCorta.format(getCheckOut())+"\n"
+                + "Vehículo: "+getMatricula()+"\n"
+                + "Servicios: "+Arrays.toString(miArea.getServicios())+"";
+        JOptionPane.showMessageDialog(null, factura);
+    } 
+    
 
-	@Override
-	public String toString() {
-		return "Vehiculo [matricula=" + matricula + ", marca=" + marca + ", modelo=" + modelo + ", luz=" + luz
-				+ ", numOcupantes=" + numOcupantes + ", check_in=" + checkIn + ", check_out=" + checkOut
-				+ ", parcela=" + parcela /*+ ", clientes=" + clientes.size() */+ "]";
-	}
+    @Override
+    public String toString() {
+        return "Vehiculo{" + "matricula=" + matricula + ", marca=" + marca + ", modelo=" + modelo + ", numOcupantes=" + numOcupantes + ", checkIn=" + checkIn + ", checkOut=" + checkOut + ", parcela=" + parcela + ", clientes=" + clientes + '}';
+    }
+    
+    
+    
 }

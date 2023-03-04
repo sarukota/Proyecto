@@ -6,13 +6,9 @@ package clasesJava;
 
 import java.util.Date;
 
-/**
- *
- * @author sarac
- */
 public class Alerta {
     
-    private int numAlerta;
+    private String titulo;
     private String descripción;
     private Date dia;
 
@@ -20,18 +16,18 @@ public class Alerta {
         
     }
     
-    public Alerta(int numAlerta, String descripción, Date dia) {
-        this.numAlerta = numAlerta;
+    public Alerta(String titulo, String descripción, Date dia) {
+        this.titulo = titulo;
         this.descripción = descripción;
         this.dia = dia;
     }
 
-    public int getNumAlerta() {
-        return numAlerta;
+    public String getTitulo() {
+        return titulo;
     }
 
-    public void setNumAlerta(int numAlerta) {
-        this.numAlerta = numAlerta;
+    public void setTitulo(String titulo) {
+        this.titulo = titulo;
     }
 
     public String getDescripción() {
@@ -52,8 +48,12 @@ public class Alerta {
 
     @Override
     public String toString() {
-        return "Alerta{" + "numAlerta=" + numAlerta + ", descripci\u00f3n=" + descripción + ", dia=" + dia + '}';
+        return "Alerta{" + "titulo=" + titulo + ", descripci\u00f3n=" + descripción + ", dia=" + dia + '}';
     }
+    
+    
+
+  
     
     
     

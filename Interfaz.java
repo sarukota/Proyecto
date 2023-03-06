@@ -4,52 +4,128 @@
  */
 package clasesJava;
 
-import java.awt.Image;
-import java.sql.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
-import pantallasSwing.PantallaBienvenida;
+import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 
 public class Interfaz extends javax.swing.JFrame {
-
-    int contador = 1; //Contador para cambiar label de clientes
+    
+    int contador = 2; //Contador para cambiar label de clientes
     int contadorMax;
     String matricula;
-    
+
     public Interfaz() {
         initComponents();
-        pnlCliente1.setVisible(false);
+        setSize(1300,700); //Da el tamaño a la ventana
+        setLocationRelativeTo(null);//Centrar el JFrame
+        setResizable(false);
+        lblMenu.setSize(300,700);
+        tpnlPantallas.setSize(1000,700);
+        ImageIcon fondo = new ImageIcon("src/main/java/imagenes/wallpaperVan2.jpg");
+        lblMenu.setIcon(fondo);
+    }
+    
+    //se instancia un nuevo vehículo con los datos de los campos
+    public Vehiculo crearVehiculo(){
+        Vehiculo vehiculo = new Vehiculo();
+        vehiculo.setMatricula(tfMatricula.getText());
+        matricula = vehiculo.getMatricula();
+        vehiculo.setMarca(tfMarca.getText());
+        vehiculo.setModelo(tfModelo.getText());
+        vehiculo.setCheckIn(dcCheckIn.getDate());
+        vehiculo.setCheckOut(dcCheckOut.getDate());
+        vehiculo.setNumOcupantes (Integer.parseInt(cbOcupantes.getSelectedItem().toString())); //parseo el objeto recogido por el comboBox a int
+        contadorMax = vehiculo.getNumOcupantes();
+        return vehiculo;
+    }
+    
+    //se instancia un nuevo vehículo con los datos de los campos
+    public Parcela crearParcela(){
+        Parcela parcela = new Parcela();
+        parcela.setNumParcela(Integer.parseInt(cbParcela.getSelectedItem().toString()));
+        parcela.setDisponible(false);
+        return parcela;
+    }
+    
+    //Método para crear un nuevo cliente con los datos del cuestionario
+    public Cliente crearCliente(){
+        Cliente cliente = new Cliente();
+        cliente.setDni(tfDNI.getText());
+        cliente.setNacionalidad(tfNacionalidad.getText());
+        cliente.setNombre(tfNombre.getText());
+        cliente.setApellido1(tfApellido1.getText());
+        cliente.setApellido2(tfApellido2.getText());
+        cliente.setFechaNac(dcFechaNac.getDate());
+        cliente.setTelefono(Integer.parseInt(tfTelefono.getText()));
+        cliente.setMail(tfMail.getText());
+        return cliente;
+    }
+    
+    //método para introducir los datos de un vehículo en la BD
+    public void guardarVehiculoBD(Vehiculo vehiculo) throws SQLException{
+        ConexionBBDD conexion = new ConexionBBDD();
+        Connection connect = DriverManager.getConnection(conexion.getBBDD(),conexion.getUSER(),conexion.getPASSWORD());
+	Statement sentencia = connect.createStatement();
+	sentencia.executeUpdate("USE furgoGestion;");
+        System.out.println("usando furgoGestion");
+        String insert = "INSERT INTO vehiculos (matricula, marca, modelo, num_ocupantes, check_in, check_out)"
+                + "VALUES ('"+vehiculo.getMatricula()+"','"+vehiculo.getMarca()+"','"+vehiculo.getModelo()+"',"+vehiculo.getNumOcupantes()+",'"
+                + conexion.fechaSQL(vehiculo.getCheckIn())+"','"+conexion.fechaSQL(vehiculo.getCheckOut())+"');";
+        sentencia.executeUpdate(insert);
+        System.out.println("los datos se han insertado correctamente");
+        sentencia.close();
+        connect.close();
+    }
+    
+    public void cambiarAVehiculos(){
+        if ((contador-1) >= contadorMax){
+            pnlClientes.setVisible(false);
+            JOptionPane.showMessageDialog(null, "Todos los clientes del vehículo " +matricula+" han sido guardados" );
+            
+            tfMatricula.setEnabled(true);
+            tfMarca.setEnabled(true);
+            tfModelo.setEnabled(true);
+            dcCheckIn.setEnabled(true);
+            dcCheckOut.setEnabled(true);
+            cbOcupantes.setEnabled(true);
+            cbParcela.setEnabled(true);
+
+            //Limpio todos los campos de la interfaz
+            tfMatricula.setText(null);
+            tfMarca.setText(null);
+            tfModelo.setText(null);
+            dcCheckIn.setDate(null);
+            dcCheckOut.setDate(null);
+            cbOcupantes.setSelectedIndex(0);
+            cbParcela.setSelectedIndex(0);
+            
+        }
     }
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        pestanias = new javax.swing.JTabbedPane();
-        pnlRegistroUsuarios = new javax.swing.JPanel();
-        pnlVehiculos = new javax.swing.JPanel();
-        lblMatricula = new javax.swing.JLabel();
-        tfMatricula = new javax.swing.JTextField();
-        lblMarca = new javax.swing.JLabel();
-        tfMarca = new javax.swing.JTextField();
-        lblModelo = new javax.swing.JLabel();
-        tfModelo = new javax.swing.JTextField();
-        cbLuz = new javax.swing.JCheckBox();
-        lblCheckIn = new javax.swing.JLabel();
-        lblCheckOut = new javax.swing.JLabel();
-        lblOcupantes = new javax.swing.JLabel();
-        cbOcupantes = new javax.swing.JComboBox<>();
-        lblParcela = new javax.swing.JLabel();
-        cbParcela = new javax.swing.JComboBox<>();
-        btnGuardarVehiculo = new javax.swing.JButton();
-        dcCheckIn = new com.toedter.calendar.JDateChooser();
-        dcCheckOut = new com.toedter.calendar.JDateChooser();
-        pnlCliente1 = new javax.swing.JPanel();
+        pnlBtnRegistro = new javax.swing.JPanel();
+        jLabel2 = new javax.swing.JLabel();
+        pnlBtnGestion = new javax.swing.JPanel();
+        jLabel3 = new javax.swing.JLabel();
+        pnlBtnMapa = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
+        pnlBtnAlertas = new javax.swing.JPanel();
+        jLabel5 = new javax.swing.JLabel();
+        pnlBtnInfo = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        lblMenu = new javax.swing.JLabel();
+        tpnlPantallas = new javax.swing.JTabbedPane();
+        pnlBienvenida = new javax.swing.JPanel();
+        pnlRegistro = new javax.swing.JPanel();
+        pnlClientes = new javax.swing.JPanel();
         lblDNI = new javax.swing.JLabel();
         tfDNI = new javax.swing.JTextField();
         lblNacionalidad = new javax.swing.JLabel();
@@ -62,53 +138,260 @@ public class Interfaz extends javax.swing.JFrame {
         lblApellido2 = new javax.swing.JLabel();
         lblFechaNac = new javax.swing.JLabel();
         dcFechaNac = new com.toedter.calendar.JDateChooser();
-        lblProvincia = new javax.swing.JLabel();
-        tfProvincia = new javax.swing.JTextField();
         lblTelefono = new javax.swing.JLabel();
         tfTelefono = new javax.swing.JTextField();
         lblMail = new javax.swing.JLabel();
         tfMail = new javax.swing.JTextField();
         btnGuardarCliente = new javax.swing.JButton();
         lblCliente = new javax.swing.JLabel();
-        pnlPlano = new javax.swing.JPanel();
-        btnImportarMapa = new javax.swing.JButton();
-        lblImagen = new javax.swing.JLabel();
+        lblTitulo = new javax.swing.JLabel();
+        pnlVehiculos = new javax.swing.JPanel();
+        lblMatricula = new javax.swing.JLabel();
+        lblMarca = new javax.swing.JLabel();
+        tfMatricula = new javax.swing.JTextField();
+        tfMarca = new javax.swing.JTextField();
+        lblModelo = new javax.swing.JLabel();
+        tfModelo = new javax.swing.JTextField();
+        lblCheckIn = new javax.swing.JLabel();
+        lblCheckOut = new javax.swing.JLabel();
+        dcCheckIn = new com.toedter.calendar.JDateChooser();
+        dcCheckOut = new com.toedter.calendar.JDateChooser();
+        cbOcupantes = new javax.swing.JComboBox<>();
+        lblOcupantes = new javax.swing.JLabel();
+        lblParcela = new javax.swing.JLabel();
+        cbParcela = new javax.swing.JComboBox<>();
+        btnGuardarVehiculo = new javax.swing.JButton();
+        jLabel6 = new javax.swing.JLabel();
+        pnlGestion = new javax.swing.JPanel();
+        pnlMapa = new javax.swing.JPanel();
+        pnlAlertas = new javax.swing.JPanel();
+        pnlDatos = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("FurgoGestion");
-        setSize(new java.awt.Dimension(600, 400));
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        pnlBtnRegistro.setBackground(new java.awt.Color(0, 153, 204));
+        pnlBtnRegistro.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                pnlBtnRegistroMouseClicked(evt);
+            }
+        });
+        pnlBtnRegistro.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel2.setFont(new java.awt.Font("Rockwell Nova", 1, 14)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setText("REGISTRO");
+        jLabel2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        pnlBtnRegistro.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 0, 90, 50));
+
+        getContentPane().add(pnlBtnRegistro, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 70, 340, 50));
+
+        pnlBtnGestion.setBackground(new java.awt.Color(0, 153, 204));
+        pnlBtnGestion.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        pnlBtnGestion.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                pnlBtnGestionMouseClicked(evt);
+            }
+        });
+        pnlBtnGestion.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel3.setFont(new java.awt.Font("Rockwell Nova", 1, 14)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel3.setText("GESTIÓN");
+        pnlBtnGestion.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 0, 90, 50));
+
+        getContentPane().add(pnlBtnGestion, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 130, 340, 50));
+
+        pnlBtnMapa.setBackground(new java.awt.Color(0, 153, 204));
+        pnlBtnMapa.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        pnlBtnMapa.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                pnlBtnMapaMouseClicked(evt);
+            }
+        });
+        pnlBtnMapa.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel4.setFont(new java.awt.Font("Rockwell Nova", 1, 14)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel4.setText("MAPA");
+        pnlBtnMapa.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 0, 90, 50));
+
+        getContentPane().add(pnlBtnMapa, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 190, 340, 50));
+
+        pnlBtnAlertas.setBackground(new java.awt.Color(0, 153, 204));
+        pnlBtnAlertas.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        pnlBtnAlertas.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                pnlBtnAlertasMouseClicked(evt);
+            }
+        });
+        pnlBtnAlertas.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel5.setFont(new java.awt.Font("Rockwell Nova", 1, 14)); // NOI18N
+        jLabel5.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel5.setText("ALERTAS");
+        pnlBtnAlertas.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 0, 90, 50));
+
+        getContentPane().add(pnlBtnAlertas, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 250, 340, 50));
+
+        pnlBtnInfo.setBackground(new java.awt.Color(0, 153, 204));
+        pnlBtnInfo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        pnlBtnInfo.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                pnlBtnInfoMouseClicked(evt);
+            }
+        });
+        pnlBtnInfo.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel1.setFont(new java.awt.Font("Rockwell Nova", 1, 14)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel1.setText("INFORMACIÓN");
+        pnlBtnInfo.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 0, 140, 50));
+
+        getContentPane().add(pnlBtnInfo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 310, 340, 50));
+        getContentPane().add(lblMenu, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 340, 700));
+
+        javax.swing.GroupLayout pnlBienvenidaLayout = new javax.swing.GroupLayout(pnlBienvenida);
+        pnlBienvenida.setLayout(pnlBienvenidaLayout);
+        pnlBienvenidaLayout.setHorizontalGroup(
+            pnlBienvenidaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1110, Short.MAX_VALUE)
+        );
+        pnlBienvenidaLayout.setVerticalGroup(
+            pnlBienvenidaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 670, Short.MAX_VALUE)
+        );
+
+        tpnlPantallas.addTab("bienv", pnlBienvenida);
+
+        pnlRegistro.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        pnlClientes.setBackground(new java.awt.Color(0, 153, 204));
+        pnlClientes.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        lblDNI.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
+        lblDNI.setText("DNI/ID:");
+        pnlClientes.add(lblDNI, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 100, -1, -1));
+
+        tfDNI.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tfDNIActionPerformed(evt);
+            }
+        });
+        pnlClientes.add(tfDNI, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 90, 140, 30));
+
+        lblNacionalidad.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
+        lblNacionalidad.setText("Nacionalidad:");
+        pnlClientes.add(lblNacionalidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 300, -1, -1));
+        pnlClientes.add(tfNacionalidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 290, 230, 30));
+
+        lblNombre.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
+        lblNombre.setText("Nombre:");
+        pnlClientes.add(lblNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 150, -1, -1));
+        pnlClientes.add(tfNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 140, 230, 30));
+
+        lblApellido1.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
+        lblApellido1.setText("Apellido 1:");
+        pnlClientes.add(lblApellido1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 200, -1, -1));
+        pnlClientes.add(tfApellido1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 190, 230, 30));
+        pnlClientes.add(tfApellido2, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 240, 230, 30));
+
+        lblApellido2.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
+        lblApellido2.setText("Apellido 2:");
+        pnlClientes.add(lblApellido2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 250, -1, -1));
+
+        lblFechaNac.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
+        lblFechaNac.setText("Fecha nac:");
+        pnlClientes.add(lblFechaNac, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 350, -1, -1));
+        pnlClientes.add(dcFechaNac, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 340, 230, 30));
+
+        lblTelefono.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
+        lblTelefono.setText("Teléfono:");
+        pnlClientes.add(lblTelefono, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 400, -1, -1));
+        pnlClientes.add(tfTelefono, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 390, 230, 30));
+
+        lblMail.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
+        lblMail.setText("E-Mail:");
+        pnlClientes.add(lblMail, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 450, -1, -1));
+        pnlClientes.add(tfMail, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 440, 230, 30));
+
+        btnGuardarCliente.setFont(new java.awt.Font("Rockwell Nova", 1, 16)); // NOI18N
+        btnGuardarCliente.setText("Guardar cliente");
+        btnGuardarCliente.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        btnGuardarCliente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGuardarClienteActionPerformed(evt);
+            }
+        });
+        pnlClientes.add(btnGuardarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 550, 184, 40));
+
+        lblCliente.setFont(new java.awt.Font("Rockwell Nova", 1, 16)); // NOI18N
+        lblCliente.setText("Cliente 1:");
+        pnlClientes.add(lblCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, 100, -1));
+
+        lblTitulo.setFont(new java.awt.Font("Rockwell Nova", 0, 18)); // NOI18N
+        lblTitulo.setText("Inserta los datos de los clientes:");
+        pnlClientes.add(lblTitulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 40, -1, -1));
+
+        pnlRegistro.add(pnlClientes, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 0, 630, 670));
+
+        pnlVehiculos.setBackground(new java.awt.Color(0, 153, 204));
+        pnlVehiculos.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        lblMatricula.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblMatricula.setText("Matrícula:");
+        pnlVehiculos.add(lblMatricula, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 120, -1, -1));
+
+        lblMarca.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
+        lblMarca.setText("Marca:");
+        pnlVehiculos.add(lblMarca, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 170, -1, -1));
 
         tfMatricula.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 tfMatriculaActionPerformed(evt);
             }
         });
+        pnlVehiculos.add(tfMatricula, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 110, 210, 30));
+        pnlVehiculos.add(tfMarca, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 160, 210, 30));
 
-        lblMarca.setText("Marca:");
-
+        lblModelo.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblModelo.setText("Modelo:");
+        pnlVehiculos.add(lblModelo, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 220, -1, -1));
+        pnlVehiculos.add(tfModelo, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 210, 210, 30));
 
-        cbLuz.setText("Luz");
-
+        lblCheckIn.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblCheckIn.setText("Check-in:");
+        pnlVehiculos.add(lblCheckIn, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 310, -1, -1));
 
+        lblCheckOut.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblCheckOut.setText("Check-out:");
-
-        lblOcupantes.setText("Ocupantes:");
+        pnlVehiculos.add(lblCheckOut, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 310, -1, -1));
+        pnlVehiculos.add(dcCheckIn, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 350, 130, 30));
+        pnlVehiculos.add(dcCheckOut, new org.netbeans.lib.awtextra.AbsoluteConstraints(285, 350, 130, 30));
 
         cbOcupantes.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6" }));
+        cbOcupantes.setMaximumSize(new java.awt.Dimension(70, 20));
+        cbOcupantes.setMinimumSize(new java.awt.Dimension(70, 20));
+        cbOcupantes.setPreferredSize(new java.awt.Dimension(70, 20));
         cbOcupantes.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbOcupantesActionPerformed(evt);
             }
         });
+        pnlVehiculos.add(cbOcupantes, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 460, 90, 30));
 
+        lblOcupantes.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
+        lblOcupantes.setText("Ocupantes:");
+        pnlVehiculos.add(lblOcupantes, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 420, -1, -1));
+
+        lblParcela.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblParcela.setText("Parcela:");
+        pnlVehiculos.add(lblParcela, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 420, -1, -1));
 
         cbParcela.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
+        cbParcela.setMaximumSize(new java.awt.Dimension(70, 20));
+        cbParcela.setMinimumSize(new java.awt.Dimension(70, 20));
+        cbParcela.setPreferredSize(new java.awt.Dimension(70, 20));
         /*if (cbLuz.isSelected()){
             cbParcela.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6" }));
         }else{
@@ -120,7 +403,9 @@ public class Interfaz extends javax.swing.JFrame {
                 cbParcelaActionPerformed(evt);
             }
         });
+        pnlVehiculos.add(cbParcela, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 460, 80, 30));
 
+        btnGuardarVehiculo.setFont(new java.awt.Font("Rockwell Nova", 1, 16)); // NOI18N
         btnGuardarVehiculo.setText("Guardar vehiculo");
         btnGuardarVehiculo.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         btnGuardarVehiculo.addActionListener(new java.awt.event.ActionListener() {
@@ -128,429 +413,165 @@ public class Interfaz extends javax.swing.JFrame {
                 btnGuardarVehiculoActionPerformed(evt);
             }
         });
+        pnlVehiculos.add(btnGuardarVehiculo, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 550, -1, 40));
 
-        javax.swing.GroupLayout pnlVehiculosLayout = new javax.swing.GroupLayout(pnlVehiculos);
-        pnlVehiculos.setLayout(pnlVehiculosLayout);
-        pnlVehiculosLayout.setHorizontalGroup(
-            pnlVehiculosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlVehiculosLayout.createSequentialGroup()
-                .addGap(29, 29, 29)
-                .addGroup(pnlVehiculosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(cbLuz)
-                    .addGroup(pnlVehiculosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlVehiculosLayout.createSequentialGroup()
-                            .addGroup(pnlVehiculosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(lblMarca)
-                                .addComponent(lblMatricula)
-                                .addComponent(lblModelo))
-                            .addGap(18, 18, 18)
-                            .addGroup(pnlVehiculosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(tfMatricula, javax.swing.GroupLayout.DEFAULT_SIZE, 120, Short.MAX_VALUE)
-                                .addComponent(tfMarca)
-                                .addComponent(tfModelo)))
-                        .addComponent(btnGuardarVehiculo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(pnlVehiculosLayout.createSequentialGroup()
-                            .addGroup(pnlVehiculosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(cbOcupantes, 0, 1, Short.MAX_VALUE)
-                                .addComponent(lblOcupantes, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGap(59, 59, 59)
-                            .addGroup(pnlVehiculosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                .addComponent(lblParcela)
-                                .addComponent(cbParcela, javax.swing.GroupLayout.PREFERRED_SIZE, 60, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGap(12, 12, 12)))
-                    .addGroup(pnlVehiculosLayout.createSequentialGroup()
-                        .addGroup(pnlVehiculosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblCheckIn)
-                            .addComponent(dcCheckIn, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(32, 32, 32)
-                        .addGroup(pnlVehiculosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblCheckOut)
-                            .addComponent(dcCheckOut, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(0, 27, Short.MAX_VALUE))
+        jLabel6.setFont(new java.awt.Font("Rockwell Nova", 0, 18)); // NOI18N
+        jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel6.setText("Introduce los datos del vehículo:");
+        pnlVehiculos.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 40, -1, -1));
+
+        pnlRegistro.add(pnlVehiculos, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 470, 670));
+
+        tpnlPantallas.addTab("reg", pnlRegistro);
+
+        javax.swing.GroupLayout pnlGestionLayout = new javax.swing.GroupLayout(pnlGestion);
+        pnlGestion.setLayout(pnlGestionLayout);
+        pnlGestionLayout.setHorizontalGroup(
+            pnlGestionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1110, Short.MAX_VALUE)
         );
-        pnlVehiculosLayout.setVerticalGroup(
-            pnlVehiculosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlVehiculosLayout.createSequentialGroup()
-                .addGap(24, 24, 24)
-                .addGroup(pnlVehiculosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblMatricula)
-                    .addComponent(tfMatricula, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(pnlVehiculosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblMarca)
-                    .addComponent(tfMarca, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(19, 19, 19)
-                .addGroup(pnlVehiculosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(tfModelo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblModelo))
-                .addGap(18, 18, 18)
-                .addGroup(pnlVehiculosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblCheckIn)
-                    .addComponent(lblCheckOut))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(pnlVehiculosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(dcCheckIn, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(dcCheckOut, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(140, 140, 140)
-                .addComponent(cbLuz)
-                .addGap(18, 18, 18)
-                .addGroup(pnlVehiculosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblOcupantes)
-                    .addComponent(lblParcela))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(pnlVehiculosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(cbOcupantes, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(cbParcela, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(26, 26, 26)
-                .addComponent(btnGuardarVehiculo)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        pnlGestionLayout.setVerticalGroup(
+            pnlGestionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 670, Short.MAX_VALUE)
         );
 
-        lblDNI.setText("DNI/ID:");
+        tpnlPantallas.addTab("ges", pnlGestion);
 
-        tfDNI.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfDNIActionPerformed(evt);
-            }
-        });
-
-        lblNacionalidad.setText("Nacionalidad:");
-
-        lblNombre.setText("Nombre:");
-
-        lblApellido1.setText("Apellido 1:");
-
-        lblApellido2.setText("Apellido 2:");
-
-        lblFechaNac.setText("Fecha nac:");
-
-        lblProvincia.setText("Provincia procedencia");
-
-        lblTelefono.setText("Teléfono:");
-
-        lblMail.setText("E-Mail:");
-
-        btnGuardarCliente.setText("Guardar cliente");
-        btnGuardarCliente.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        btnGuardarCliente.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnGuardarClienteActionPerformed(evt);
-            }
-        });
-
-        lblCliente.setFont(new java.awt.Font("Segoe UI", 1, 14)); // NOI18N
-        lblCliente.setText("Cliente 1:");
-
-        javax.swing.GroupLayout pnlCliente1Layout = new javax.swing.GroupLayout(pnlCliente1);
-        pnlCliente1.setLayout(pnlCliente1Layout);
-        pnlCliente1Layout.setHorizontalGroup(
-            pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlCliente1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlCliente1Layout.createSequentialGroup()
-                        .addComponent(lblProvincia)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(tfProvincia, javax.swing.GroupLayout.PREFERRED_SIZE, 272, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(pnlCliente1Layout.createSequentialGroup()
-                        .addComponent(lblTelefono)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(tfTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(lblMail)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 209, Short.MAX_VALUE)
-                        .addComponent(tfMail, javax.swing.GroupLayout.PREFERRED_SIZE, 126, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(pnlCliente1Layout.createSequentialGroup()
-                        .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(pnlCliente1Layout.createSequentialGroup()
-                                .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(pnlCliente1Layout.createSequentialGroup()
-                                        .addComponent(lblDNI)
-                                        .addGap(26, 26, 26)
-                                        .addComponent(tfDNI, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(pnlCliente1Layout.createSequentialGroup()
-                                        .addComponent(lblApellido2)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(tfApellido2, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                    .addGroup(pnlCliente1Layout.createSequentialGroup()
-                                        .addComponent(lblNombre)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(tfNombre, javax.swing.GroupLayout.PREFERRED_SIZE, 123, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(113, 113, 113))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlCliente1Layout.createSequentialGroup()
-                                .addComponent(lblCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(126, 126, 126)))
-                        .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lblNacionalidad)
-                            .addComponent(lblApellido1)
-                            .addComponent(lblFechaNac))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(tfNacionalidad, javax.swing.GroupLayout.PREFERRED_SIZE, 125, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(tfApellido1)
-                            .addComponent(dcFechaNac, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(24, 24, 24))
-            .addGroup(pnlCliente1Layout.createSequentialGroup()
-                .addGap(145, 145, 145)
-                .addComponent(btnGuardarCliente, javax.swing.GroupLayout.PREFERRED_SIZE, 184, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        javax.swing.GroupLayout pnlMapaLayout = new javax.swing.GroupLayout(pnlMapa);
+        pnlMapa.setLayout(pnlMapaLayout);
+        pnlMapaLayout.setHorizontalGroup(
+            pnlMapaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1110, Short.MAX_VALUE)
         );
-        pnlCliente1Layout.setVerticalGroup(
-            pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlCliente1Layout.createSequentialGroup()
-                .addGap(18, 18, 18)
-                .addComponent(lblCliente)
-                .addGap(28, 28, 28)
-                .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(pnlCliente1Layout.createSequentialGroup()
-                        .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblDNI)
-                            .addComponent(tfDNI, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblNombre)
-                            .addComponent(tfNombre, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblApellido2)
-                            .addComponent(tfApellido2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(pnlCliente1Layout.createSequentialGroup()
-                        .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblNacionalidad)
-                            .addComponent(tfNacionalidad, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(lblApellido1)
-                            .addComponent(tfApellido1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(lblFechaNac)
-                            .addComponent(dcFechaNac, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addGap(18, 18, 18)
-                .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblProvincia)
-                    .addComponent(tfProvincia, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(30, 30, 30)
-                .addGroup(pnlCliente1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblTelefono)
-                    .addComponent(tfTelefono, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(lblMail)
-                    .addComponent(tfMail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 197, Short.MAX_VALUE)
-                .addComponent(btnGuardarCliente)
-                .addGap(33, 33, 33))
+        pnlMapaLayout.setVerticalGroup(
+            pnlMapaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 670, Short.MAX_VALUE)
         );
 
-        javax.swing.GroupLayout pnlRegistroUsuariosLayout = new javax.swing.GroupLayout(pnlRegistroUsuarios);
-        pnlRegistroUsuarios.setLayout(pnlRegistroUsuariosLayout);
-        pnlRegistroUsuariosLayout.setHorizontalGroup(
-            pnlRegistroUsuariosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlRegistroUsuariosLayout.createSequentialGroup()
-                .addComponent(pnlVehiculos, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(pnlCliente1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(306, Short.MAX_VALUE))
+        tpnlPantallas.addTab("mapa", pnlMapa);
+
+        javax.swing.GroupLayout pnlAlertasLayout = new javax.swing.GroupLayout(pnlAlertas);
+        pnlAlertas.setLayout(pnlAlertasLayout);
+        pnlAlertasLayout.setHorizontalGroup(
+            pnlAlertasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 1110, Short.MAX_VALUE)
         );
-        pnlRegistroUsuariosLayout.setVerticalGroup(
-            pnlRegistroUsuariosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(pnlVehiculos, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addGroup(pnlRegistroUsuariosLayout.createSequentialGroup()
-                .addComponent(pnlCliente1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(0, 99, Short.MAX_VALUE))
+        pnlAlertasLayout.setVerticalGroup(
+            pnlAlertasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 670, Short.MAX_VALUE)
         );
 
-        pestanias.addTab("Registro de usuarios", pnlRegistroUsuarios);
+        tpnlPantallas.addTab("aler", pnlAlertas);
 
-        btnImportarMapa.setText("Importar mapa");
-        btnImportarMapa.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnImportarMapaActionPerformed(evt);
-            }
-        });
+        pnlDatos.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        tpnlPantallas.addTab("dato", pnlDatos);
 
-        lblImagen.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+        getContentPane().add(tpnlPantallas, new org.netbeans.lib.awtextra.AbsoluteConstraints(337, 0, 1110, -1));
 
-        javax.swing.GroupLayout pnlPlanoLayout = new javax.swing.GroupLayout(pnlPlano);
-        pnlPlano.setLayout(pnlPlanoLayout);
-        pnlPlanoLayout.setHorizontalGroup(
-            pnlPlanoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlPlanoLayout.createSequentialGroup()
-                .addGap(17, 17, 17)
-                .addGroup(pnlPlanoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(btnImportarMapa)
-                    .addComponent(lblImagen, javax.swing.GroupLayout.DEFAULT_SIZE, 734, Short.MAX_VALUE))
-                .addContainerGap(433, Short.MAX_VALUE))
-        );
-        pnlPlanoLayout.setVerticalGroup(
-            pnlPlanoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlPlanoLayout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addComponent(btnImportarMapa, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(lblImagen, javax.swing.GroupLayout.DEFAULT_SIZE, 417, Short.MAX_VALUE)
-                .addContainerGap(132, Short.MAX_VALUE))
-        );
-
-        pestanias.addTab("Plano del área", pnlPlano);
-
-        getContentPane().add(pestanias, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
-
-        setSize(new java.awt.Dimension(712, 536));
-        setLocationRelativeTo(null);
+        pack();
     }// </editor-fold>//GEN-END:initComponents
-
-        public Vehiculo crearVehiculo(){
-        //Al pulsa boton guardar en vehiculo, se instancia un nuevo vehículo con los datos de los campos
-        Vehiculo vehiculo = new Vehiculo();
-        Parcela parcela = new Parcela();
-     
-        parcela.setNumParcela(cbParcela.getSelectedIndex());
-        parcela.setDisponible(false);
-        
-        vehiculo.setMatricula(tfMatricula.getText());
-        matricula = vehiculo.getMatricula();
-        vehiculo.setMarca(tfMarca.getText());
-        vehiculo.setModelo(tfModelo.getText());
-        vehiculo.setCheckIn(dcCheckIn.getDate());
-        vehiculo.setCheckOut(dcCheckOut.getDate());
-        vehiculo.setNumOcupantes (Integer.parseInt(cbOcupantes.getSelectedItem().toString())); //parseo el objeto recogido por el comboBox a int
-        contadorMax = vehiculo.getNumOcupantes();
-        vehiculo.setParcela(parcela);
-        
-        return vehiculo;
-    }
-    
-    //Método para convertir una fecha en formato java.util.Date a un String válido para "date" en MySQL
-    public String fechaSQL (java.util.Date fechaJava){
-        DateFormat dateFormat = new SimpleDateFormat ("yyyy-MM-dd");
-        String fechaSQL = dateFormat.format(fechaJava);
-        return fechaSQL;
-    }
-  
-    //método para introducir los datos de un vehículo en la BD
-    public void guardarVehiculoBD(Vehiculo vehiculo) throws SQLException{
-        ConexionBBDD conexion = new ConexionBBDD();
-        Connection connect = DriverManager.getConnection(conexion.getBBDD(),conexion.getUSER(),conexion.getPASSWORD());
-	Statement sentencia = connect.createStatement();
-	sentencia.executeUpdate("USE furgoGestion;");
-        System.out.println("usando furgoGestion");
-        String insert = "INSERT INTO vehiculos (matricula, marca, modelo, num_ocupantes, check_in, check_out)"
-                + "VALUES ('"+vehiculo.getMatricula()+"','"+vehiculo.getMarca()+"','"+vehiculo.getModelo()+"',"+vehiculo.getNumOcupantes()+",'"
-                + fechaSQL(vehiculo.getCheckIn())+"','"+fechaSQL(vehiculo.getCheckOut())+"');";
-        sentencia.executeUpdate(insert);
-        System.out.println("los datos se han insertado correctamente");
-        sentencia.close();
-        connect.close();
-    }
-    
-    public Cliente crearCliente(){
-        
-        Cliente cliente = new Cliente();
-        
-        cliente.setDni(tfDNI.getText());
-        cliente.setNacionalidad(tfNacionalidad.getText());
-        cliente.setNombre(tfNombre.getText());
-        cliente.setApellido1(tfApellido1.getText());
-        cliente.setApellido2(tfApellido2.getText());
-        cliente.setFechaNac(dcFechaNac.getDate());
-        cliente.setTelefono(Integer.parseInt(tfTelefono.getText()));
-        cliente.setMail(tfMail.getText());
-                
-        return cliente;
-    }
-    
-    //Método para seleccionar la ruta absoluta de un archivo de imagen con un JFileChooser
-    public String seleccionarImagen(){
-        JFileChooser chooser = new JFileChooser(); //Declaro el FileChooser
-        FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG, GIF & PNG Images", "jpg", "gif", "png");
-        chooser.setFileFilter(filter); //Pongo un filtro para la extensión de los archivos
-        int returnVal = chooser.showOpenDialog(null); //Se abre la ventana de FileChooser
-        if(returnVal == JFileChooser.APPROVE_OPTION) { //Si se presiona el botón aceptar
-           System.out.println("You chose to open this file: " + chooser.getSelectedFile().getPath());
-        }
-        return chooser.getSelectedFile().getPath();
-    }
-    
-    //Metodo para insertar una imagen en un Jlabel
-    public void insertarImagen (JLabel labelFondo, String ruta){ 
-        ImageIcon imagen = new ImageIcon(ruta); //obtengo una imagen de la ruta específica
-        ImageIcon imagenEscala = new ImageIcon(imagen.getImage().getScaledInstance(labelFondo.getWidth(), labelFondo.getHeight(), Image.SCALE_DEFAULT)); //para ajustar imagen al tamaño del label
-        if (imagenEscala.getImageLoadStatus() == java.awt.MediaTracker.COMPLETE) {
-            labelFondo.setText("");
-            labelFondo.setIcon(imagenEscala); // Se coloca en el JLabel
-        }else{
-            System.err.println("Ha ocurrido un error");
-        }
-    }
-    
-    private void cbOcupantesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbOcupantesActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cbOcupantesActionPerformed
-
-    private void btnGuardarVehiculoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarVehiculoActionPerformed
-        // TODO add your handling code here:
-        Vehiculo vehiculo = crearVehiculo();
-        
-        try {
-            guardarVehiculoBD(vehiculo);
-            System.out.println("Se ha insertado el vehiculo en la BD");
-        } catch (SQLException ex) {
-            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("fallo al insertar el vehiculo en la BD");
-        }
-        
-        System.out.println(vehiculo.toString());
-        System.out.println("numero ocupantes" + vehiculo.getNumOcupantes());
-
-        pnlCliente1.setVisible(true);
-        
-        //Limpio todos los campos de la interfaz
-        tfMatricula.setText(null);
-        tfMarca.setText(null);
-        tfModelo.setText(null);
-        cbLuz.setSelected(false);
-        dcCheckIn.setDate(null);
-        dcCheckOut.setDate(null);
-        cbOcupantes.setSelectedIndex(0);
-        cbParcela.setSelectedIndex(0);
-        
-        pnlVehiculos.setVisible(false);
-    }//GEN-LAST:event_btnGuardarVehiculoActionPerformed
 
     private void tfMatriculaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfMatriculaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_tfMatriculaActionPerformed
 
+    private void cbOcupantesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbOcupantesActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbOcupantesActionPerformed
+
     private void cbParcelaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbParcelaActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_cbParcelaActionPerformed
 
+    private void btnGuardarVehiculoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarVehiculoActionPerformed
+        // TODO add your handling code here:
+        Parcela parcela = crearParcela();
+        Vehiculo vehiculo = crearVehiculo();
+        vehiculo.setParcela(parcela);
+        
+        ConexionBBDD conexion = new ConexionBBDD();
+        /*String insertVehiculo = "INSERT INTO vehiculos (matricula, marca, modelo, num_ocupantes, check_in, check_out)"
+                + "VALUES ('"+vehiculo.getMatricula()+"','"+vehiculo.getMarca()+"','"+vehiculo.getModelo()+"',"+vehiculo.getNumOcupantes()+",'"
+                + conexion.fechaSQL(vehiculo.getCheckIn())+"','"+conexion.fechaSQL(vehiculo.getCheckOut())+"');";
+        String insertParcela = "INSERT INTO parcelas (num_parcela, disponibilidad)"
+                + "VALUES ("+parcela.getNumParcela()+","+parcela.isDisponible()+");";*/
+        try {
+            conexion.insertInTabla(vehiculo.toSQL());
+            conexion.insertInTabla(parcela.toSQL());
+        } catch (SQLException ex) {
+            Logger.getLogger(InterfazOld.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("fallo al insertar el vehiculo en la BD");
+        }
+       
+        System.out.println(vehiculo.toString());
+        System.out.println("numero ocupantes" + vehiculo.getNumOcupantes());
+        
+        //Desabilita los componentes al introducir el vehiculo y habilita el panel Clientes
+        pnlClientes.setVisible(true);
+        tfMatricula.setEnabled(false);
+        tfMarca.setEnabled(false);
+        tfModelo.setEnabled(false);
+        dcCheckIn.setEnabled(false);
+        dcCheckOut.setEnabled(false);
+        cbOcupantes.setEnabled(false);
+        cbParcela.setEnabled(false);
+
+    }//GEN-LAST:event_btnGuardarVehiculoActionPerformed
+
     private void tfDNIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfDNIActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_tfDNIActionPerformed
-    
+
     private void btnGuardarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarClienteActionPerformed
         // TODO add your handling code here:
         //Al pulsa boton guardar en cliente, se instancia un nuevo cliente con los datos de los campos
         //se añade al set ClientesEnVehiculo y este nuevo set se añade al objeto vehículo
-        
+
         //o hago una consulta a la BD para obtener nº de ocupantes y con eso relleno variable
-        int contadorLblClientes = contador+1;
-        lblCliente.setText("Cliente "+contadorLblClientes);
+        Cliente cliente = crearCliente();
+        lblCliente.setText("Cliente "+contador);
         System.out.println("matricula: "+matricula);
-        if (contador >= contadorMax){
-        pnlCliente1.setVisible(false);
-        JOptionPane.showMessageDialog(null, "Todos los clientes del vehículo " +matricula+" han sido guardados" );
-        pnlVehiculos.setVisible(true);
-        }
+        cambiarAVehiculos();
+        /*if ((contador-1) >= contadorMax){
+            pnlClientes.setVisible(false);
+            JOptionPane.showMessageDialog(null, "Todos los clientes del vehículo " +matricula+" han sido guardados" );
+            
+            tfMatricula.setEnabled(true);
+            tfMarca.setEnabled(true);
+            tfModelo.setEnabled(true);
+            dcCheckIn.setEnabled(true);
+            dcCheckOut.setEnabled(true);
+            cbOcupantes.setEnabled(true);
+            cbParcela.setEnabled(true);
+
+            //Limpio todos los campos de la interfaz
+            tfMatricula.setText(null);
+            tfMarca.setText(null);
+            tfModelo.setText(null);
+            dcCheckIn.setDate(null);
+            dcCheckOut.setDate(null);
+            cbOcupantes.setSelectedIndex(0);
+            cbParcela.setSelectedIndex(0);
+            
+        }*/
         contador ++;
         
-        Cliente cliente1 = crearCliente();
+        ConexionBBDD conexion = new ConexionBBDD();
+        String insertCliente = "INSERT INTO clientes (dni, nombre, apellido1, apellido2, fecha_nac, nacionalidad, telefono, mail)"
+                + "VALUES ('"+cliente.getDni()+"','"+cliente.getNombre()+"','"+cliente.getApellido1()+"','"+cliente.getApellido2()+"','"
+                + conexion.fechaSQL(cliente.getFechaNac())+"','"+cliente.getNacionalidad()+"',"+cliente.getTelefono()+",'"+cliente.getMail()+"');";
+        try {
+            conexion.insertInTabla(insertCliente);  
+        } catch (SQLException ex) {
+            Logger.getLogger(InterfazOld.class.getName()).log(Level.SEVERE, null, ex);
+            System.out.println("fallo al insertar el vehiculo en la BD");
+        }
+        /*Cliente cliente1 = crearCliente();
         System.out.println(cliente1.toString());
         Set<Cliente>clientesEnVehiculo = new HashSet<Cliente>();
         clientesEnVehiculo.add(cliente1);
-        System.out.println(clientesEnVehiculo.toString());
-        
+        System.out.println(clientesEnVehiculo.toString());*/
+
         //Limpio todos los campos de la interfaz
         tfDNI.setText(null);
         tfNacionalidad.setText(null);
@@ -558,25 +579,33 @@ public class Interfaz extends javax.swing.JFrame {
         tfApellido1.setText(null);
         tfApellido2.setText(null);
         dcFechaNac.setDate(null);
-        tfProvincia.setText(null);
         tfTelefono.setText(null);
         tfMail.setText(null);
-        
-        
-        
-    }//GEN-LAST:event_btnGuardarClienteActionPerformed
-    
-    private void btnImportarMapaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportarMapaActionPerformed
-        // TODO add your handling code here:
-        //Coloca la imagen seleccionada con el metodo seleccionarImagen en una etiqueta
-        String pathMapa = seleccionarImagen(); //Guardo la ruta del archivo
-        //this.setLocationRelativeTo(this); Para iniciar programa en el centro de la pantalla
-        insertarImagen (lblImagen, pathMapa);
-    }//GEN-LAST:event_btnImportarMapaActionPerformed
 
-    /**
-     * @param args the command line arguments
-     */
+    }//GEN-LAST:event_btnGuardarClienteActionPerformed
+
+    private void pnlBtnRegistroMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlBtnRegistroMouseClicked
+        tpnlPantallas.setSelectedIndex(1);
+        pnlClientes.setVisible(false);
+    }//GEN-LAST:event_pnlBtnRegistroMouseClicked
+
+    private void pnlBtnGestionMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlBtnGestionMouseClicked
+        tpnlPantallas.setSelectedIndex(2);
+    }//GEN-LAST:event_pnlBtnGestionMouseClicked
+
+    private void pnlBtnMapaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlBtnMapaMouseClicked
+        tpnlPantallas.setSelectedIndex(3);
+    }//GEN-LAST:event_pnlBtnMapaMouseClicked
+
+    private void pnlBtnAlertasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlBtnAlertasMouseClicked
+        tpnlPantallas.setSelectedIndex(4);
+    }//GEN-LAST:event_pnlBtnAlertasMouseClicked
+
+    private void pnlBtnInfoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlBtnInfoMouseClicked
+        tpnlPantallas.setSelectedIndex(5);
+    }//GEN-LAST:event_pnlBtnInfoMouseClicked
+
+    
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -600,22 +629,6 @@ public class Interfaz extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(Interfaz.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        
-        //Conecta con BD, crea la nueva BD y todas las tablas correspondientes
-        
-        ConexionBBDD connect = new ConexionBBDD();
-		try {
-			connect.crearTablas();
-                        System.out.println("Se ha conectado correctamente a la BD");
-		} catch (SQLException ex) {
-			System.err.println("No se ha podido conectar al servidor SQL");
-			ex.printStackTrace();
-		}
-                
-        PantallaBienvenida bienvenida = new PantallaBienvenida();
-        bienvenida.setVisible(true);
-        
-            
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -623,19 +636,22 @@ public class Interfaz extends javax.swing.JFrame {
                 new Interfaz().setVisible(true);
             }
         });
-        
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGuardarCliente;
     private javax.swing.JButton btnGuardarVehiculo;
-    private javax.swing.JButton btnImportarMapa;
-    private javax.swing.JCheckBox cbLuz;
     private javax.swing.JComboBox<String> cbOcupantes;
     private javax.swing.JComboBox<String> cbParcela;
     private com.toedter.calendar.JDateChooser dcCheckIn;
     private com.toedter.calendar.JDateChooser dcCheckOut;
     private com.toedter.calendar.JDateChooser dcFechaNac;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel lblApellido1;
     private javax.swing.JLabel lblApellido2;
     private javax.swing.JLabel lblCheckIn;
@@ -643,21 +659,29 @@ public class Interfaz extends javax.swing.JFrame {
     private javax.swing.JLabel lblCliente;
     private javax.swing.JLabel lblDNI;
     private javax.swing.JLabel lblFechaNac;
-    private javax.swing.JLabel lblImagen;
     private javax.swing.JLabel lblMail;
     private javax.swing.JLabel lblMarca;
     private javax.swing.JLabel lblMatricula;
+    private javax.swing.JLabel lblMenu;
     private javax.swing.JLabel lblModelo;
     private javax.swing.JLabel lblNacionalidad;
     private javax.swing.JLabel lblNombre;
     private javax.swing.JLabel lblOcupantes;
     private javax.swing.JLabel lblParcela;
-    private javax.swing.JLabel lblProvincia;
     private javax.swing.JLabel lblTelefono;
-    private javax.swing.JTabbedPane pestanias;
-    private javax.swing.JPanel pnlCliente1;
-    private javax.swing.JPanel pnlPlano;
-    private javax.swing.JPanel pnlRegistroUsuarios;
+    private javax.swing.JLabel lblTitulo;
+    private javax.swing.JPanel pnlAlertas;
+    private javax.swing.JPanel pnlBienvenida;
+    private javax.swing.JPanel pnlBtnAlertas;
+    private javax.swing.JPanel pnlBtnGestion;
+    private javax.swing.JPanel pnlBtnInfo;
+    private javax.swing.JPanel pnlBtnMapa;
+    private javax.swing.JPanel pnlBtnRegistro;
+    private javax.swing.JPanel pnlClientes;
+    private javax.swing.JPanel pnlDatos;
+    private javax.swing.JPanel pnlGestion;
+    private javax.swing.JPanel pnlMapa;
+    private javax.swing.JPanel pnlRegistro;
     private javax.swing.JPanel pnlVehiculos;
     private javax.swing.JTextField tfApellido1;
     private javax.swing.JTextField tfApellido2;
@@ -668,7 +692,7 @@ public class Interfaz extends javax.swing.JFrame {
     private javax.swing.JTextField tfModelo;
     private javax.swing.JTextField tfNacionalidad;
     private javax.swing.JTextField tfNombre;
-    private javax.swing.JTextField tfProvincia;
     private javax.swing.JTextField tfTelefono;
+    private javax.swing.JTabbedPane tpnlPantallas;
     // End of variables declaration//GEN-END:variables
 }

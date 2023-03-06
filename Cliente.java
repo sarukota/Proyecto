@@ -96,6 +96,10 @@ public class Cliente {
     public void setMail(String mail) {
         this.mail = mail;
     }
+    
+    public String toSQL(){
+        
+    }
 
     @Override
     public String toString() {

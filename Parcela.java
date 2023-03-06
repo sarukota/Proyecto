@@ -33,6 +33,12 @@ public class Parcela {
     public void setDisponible(boolean disponible) {
         this.disponible = disponible;
     }
+    
+    public String toSQL(){
+        String insertParcela = "INSERT INTO parcelas (num_parcela, disponibilidad)"
+                + "VALUES ("+getNumParcela()+","+isDisponible()+");";
+        return insertParcela;
+    }
  
     @Override
     public String toString() {

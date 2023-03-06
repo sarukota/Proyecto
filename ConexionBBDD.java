@@ -5,8 +5,11 @@
 package clasesJava;
 
 import java.sql.*;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 
 
 
@@ -114,22 +117,44 @@ public class ConexionBBDD { //Ver en Eclipse M06 Acceso a datos VT05 el ejemplo
      
     //método para insertar datos en las tablas mediante un string
     public void insertInTabla(String insert)throws SQLException{
-        
-            Connection connect = DriverManager.getConnection(BBDD,USER,PASSWORD);
-            Statement sentencia = connect.createStatement();
+        try (Connection connect = DriverManager.getConnection(BBDD,USER,PASSWORD); Statement sentencia = connect.createStatement()) {
             sentencia.executeUpdate("USE furgoGestion;");
             sentencia.executeUpdate(insert);
             System.out.println("se han insertado los datos correctamente");
             sentencia.close();
-            connect.close();       
-                
+            connect.close();
+        }catch(Exception e){
+            JOptionPane.showMessageDialog(null,"Ha ocurrido un problema al insertar los datos");     
+        }
+    }
+    
+    //Método para realizar consultas en las tablas mediante un string
+    public ResultSet selectFromTabla (String select)throws SQLException{
+        ResultSet result;
+        try (Connection connect = DriverManager.getConnection(BBDD,USER,PASSWORD); Statement sentencia = connect.createStatement()) {
+                    sentencia.executeUpdate("USE furgoGestion;");
+            result = sentencia.executeQuery(select);
+            sentencia.executeUpdate(select);
+            System.out.println("se han seleccionado los datos correctamente");
+            sentencia.close();
+            connect.close();
+            return result;
+        }
+      
+    }
+    
+    //Método para convertir una fecha en formato java.util.Date a un String válido para "date" en MySQL
+    public String fechaSQL (java.util.Date fechaJava){
+        DateFormat dateFormat = new SimpleDateFormat ("yyyy-MM-dd");
+        String fechaSQL = dateFormat.format(fechaJava);
+        return fechaSQL;
     }
     
     /*//Eliminamos el esquema si existe
 		String ifExists = "DROP SCHEMA  furgoGestion;";
-		sentencia.executeUpdate(ifExists);*/
+		sentencia.executeUpdate(ifExists);
        
-                /*
+                
 		//Hacemos consultas en la BD
 		ResultSet result=sentencia.executeQuery("SELECT * FROM Alumnos;");
 		List<Alumno> alumnoList = new ArrayList<>();
@@ -140,4 +165,5 @@ public class ConexionBBDD { //Ver en Eclipse M06 Acceso a datos VT05 el ejemplo
 		
 		System.out.println(alumnoList); //Imprimimos la lista por consola
 		result.close();*/
+
 }

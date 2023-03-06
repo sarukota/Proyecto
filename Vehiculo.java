@@ -9,7 +9,6 @@ import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Set;
-import static java.util.concurrent.TimeUnit.DAYS;
 import javax.swing.JOptionPane;
 
 public class Vehiculo {
@@ -106,11 +105,18 @@ public class Vehiculo {
         Date fechaEmision = new Date(System.currentTimeMillis());
         String factura = fechaCorta.format(fechaEmision) +"\n"
                 + "Entrada: "+fechaCorta.format(getCheckIn())+"      Salida: "+fechaCorta.format(getCheckOut())+"\n"
-                + "Vehículo: "+getMatricula()+"\n"
-                + "Servicios: "+Arrays.toString(miArea.getServicios())+"";
+                + "Vehículo: "+getMatricula()+"\n";
+               //+ "Servicios: "+Arrays.toString(miArea.getServicios())+"";
         JOptionPane.showMessageDialog(null, factura);
     } 
     
+    public String toSQL(){
+        ConexionBBDD conexion = new ConexionBBDD();
+        String insertVehiculo = "INSERT INTO vehiculos (matricula, marca, modelo, num_ocupantes, check_in, check_out)"
+                + "VALUES ('"+getMatricula()+"','"+getMarca()+"','"+getModelo()+"',"+getNumOcupantes()+",'"
+                + conexion.fechaSQL(getCheckIn())+"','"+conexion.fechaSQL(getCheckOut())+"');";
+        return insertVehiculo;
+    }
 
     @Override
     public String toString() {

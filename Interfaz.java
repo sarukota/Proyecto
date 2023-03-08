@@ -4,20 +4,30 @@
  */
 package clasesJava;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.sql.*;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.ImageIcon;
-import javax.swing.JOptionPane;
-
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.table.DefaultTableModel;
 public class Interfaz extends javax.swing.JFrame {
     
+    Area miArea;
+    Vehiculo vehiculo;
+    Cliente cliente;
+    Parcela parcela;
+    Alerta alerta;
+    Servicio servicio;
+    Set <Cliente> clientes = new HashSet<>();
+    DefaultTableModel dtmResult = new DefaultTableModel(); //instancio un modelo de tabla
+    ArrayList<Servicio> listaDatos = new ArrayList<>(); //Creo un array para añadir servicios
+    Object buscarPor; //Creo un objeto para determinar la busqueda
+    
+    
     int contador = 2; //Contador para cambiar label de clientes
-    int contadorMax;
-    String matricula;
 
     public Interfaz() {
         initComponents();
@@ -30,23 +40,33 @@ public class Interfaz extends javax.swing.JFrame {
         lblMenu.setIcon(fondo);
     }
     
+    //se instancia una nueva area con los datos de los campos
+    public Area crearArea(){
+        Area area = new Area();
+        area.setDireccion(tfDireccion.getText());
+        area.setTelefono((Integer.parseInt(tfTelefonoArea.getText())));
+        area.setMail(tfEmailArea.getText());
+        area.setWeb(tfPagWeb.getText());
+        area.setNumParcelas((Integer.parseInt(tfNParcelas.getText())));
+        area.setPrecioNoche((Integer.parseInt(tfprecioNoche.getText())));
+        return area;
+    }
+    
     //se instancia un nuevo vehículo con los datos de los campos
     public Vehiculo crearVehiculo(){
-        Vehiculo vehiculo = new Vehiculo();
+        vehiculo = new Vehiculo();
         vehiculo.setMatricula(tfMatricula.getText());
-        matricula = vehiculo.getMatricula();
         vehiculo.setMarca(tfMarca.getText());
         vehiculo.setModelo(tfModelo.getText());
         vehiculo.setCheckIn(dcCheckIn.getDate());
         vehiculo.setCheckOut(dcCheckOut.getDate());
         vehiculo.setNumOcupantes (Integer.parseInt(cbOcupantes.getSelectedItem().toString())); //parseo el objeto recogido por el comboBox a int
-        contadorMax = vehiculo.getNumOcupantes();
         return vehiculo;
     }
     
-    //se instancia un nuevo vehículo con los datos de los campos
+    //se instancia una nueva parcela con los datos de los campos
     public Parcela crearParcela(){
-        Parcela parcela = new Parcela();
+        parcela = new Parcela();
         parcela.setNumParcela(Integer.parseInt(cbParcela.getSelectedItem().toString()));
         parcela.setDisponible(false);
         return parcela;
@@ -54,7 +74,7 @@ public class Interfaz extends javax.swing.JFrame {
     
     //Método para crear un nuevo cliente con los datos del cuestionario
     public Cliente crearCliente(){
-        Cliente cliente = new Cliente();
+        cliente = new Cliente();
         cliente.setDni(tfDNI.getText());
         cliente.setNacionalidad(tfNacionalidad.getText());
         cliente.setNombre(tfNombre.getText());
@@ -66,26 +86,11 @@ public class Interfaz extends javax.swing.JFrame {
         return cliente;
     }
     
-    //método para introducir los datos de un vehículo en la BD
-    public void guardarVehiculoBD(Vehiculo vehiculo) throws SQLException{
-        ConexionBBDD conexion = new ConexionBBDD();
-        Connection connect = DriverManager.getConnection(conexion.getBBDD(),conexion.getUSER(),conexion.getPASSWORD());
-	Statement sentencia = connect.createStatement();
-	sentencia.executeUpdate("USE furgoGestion;");
-        System.out.println("usando furgoGestion");
-        String insert = "INSERT INTO vehiculos (matricula, marca, modelo, num_ocupantes, check_in, check_out)"
-                + "VALUES ('"+vehiculo.getMatricula()+"','"+vehiculo.getMarca()+"','"+vehiculo.getModelo()+"',"+vehiculo.getNumOcupantes()+",'"
-                + conexion.fechaSQL(vehiculo.getCheckIn())+"','"+conexion.fechaSQL(vehiculo.getCheckOut())+"');";
-        sentencia.executeUpdate(insert);
-        System.out.println("los datos se han insertado correctamente");
-        sentencia.close();
-        connect.close();
-    }
-    
+    //Método para cambiar del frame Clientes al de vehiculos cuando ya se hayan introducido todos
     public void cambiarAVehiculos(){
-        if ((contador-1) >= contadorMax){
+        if ((contador-1) >= vehiculo.getNumOcupantes()){
             pnlClientes.setVisible(false);
-            JOptionPane.showMessageDialog(null, "Todos los clientes del vehículo " +matricula+" han sido guardados" );
+            JOptionPane.showMessageDialog(null, "Todos los clientes del vehículo " +vehiculo.getMatricula()+" han sido guardados" );
             
             tfMatricula.setEnabled(true);
             tfMarca.setEnabled(true);
@@ -105,6 +110,83 @@ public class Interfaz extends javax.swing.JFrame {
             cbParcela.setSelectedIndex(0);
             
         }
+    }
+    
+    //Método para establecer los datos del area de la BD en el pnlDatosArea
+    
+    //Método para seleccionar la ruta absoluta de un archivo de imagen con un JFileChooser
+    public String seleccionarImagen(){
+        JFileChooser chooser = new JFileChooser(); //Declaro el FileChooser
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG, GIF & PNG Images", "jpg", "gif", "png");
+        chooser.setFileFilter(filter); //Pongo un filtro para la extensión de los archivos
+        int returnVal = chooser.showOpenDialog(null); //Se abre la ventana de FileChooser
+        if(returnVal == JFileChooser.APPROVE_OPTION) { //Si se presiona el botón aceptar
+           System.out.println("You chose to open this file: " + chooser.getSelectedFile().getPath());
+        }
+        return chooser.getSelectedFile().getPath();
+    }
+    
+    //Metodo para insertar una imagen en un Jlabel
+    public void insertarImagen (JLabel labelFondo, String ruta){ 
+        ImageIcon imagen = new ImageIcon(ruta); //obtengo una imagen de la ruta específica
+        ImageIcon imagenEscala = new ImageIcon(imagen.getImage().getScaledInstance(labelFondo.getWidth(), labelFondo.getHeight(), Image.SCALE_DEFAULT)); //para ajustar imagen al tamaño del label
+        if (imagenEscala.getImageLoadStatus() == java.awt.MediaTracker.COMPLETE) {
+            labelFondo.setText("");
+            labelFondo.setIcon(imagenEscala); // Se coloca en el JLabel
+        }else{
+            System.err.println("Ha ocurrido un error");
+        }
+    }
+    
+    //Método que añade los botones de las parcelas en la pantalla del mapa
+    public void aniadirBotones(){
+        
+        for (int i = 0; i <= miArea.getNumParcelas(); i++) {
+            List<JButton>botones = new ArrayList<>();
+            JButton btn = new JButton(String.valueOf(i));
+            btn.setPreferredSize(new Dimension(40,40));
+            botones.add(btn);
+            pnlBotones.add(btn);
+        }
+        pnlBotones.updateUI();
+        
+    }
+   
+    //metodo para definir el modelo y mostrar los datos de la BD en la tabla del panel de Gestion
+    private void llenarTablaBuscar() throws SQLException{
+        buscarPor = cbSeleccion.getSelectedItem(); //guardo el tipo de busqueda que está seleccionada 
+        ConexionBBDD connect = new ConexionBBDD();
+        if (buscarPor == "Por vehiculo"){
+            String [] cabecera = {"Matricula","Marca","Modelo","NºOcupantes","Check in","Check out"};
+            dtmResult.setColumnIdentifiers(cabecera);
+            tblResult.setModel(dtmResult);
+            dtmResult.setRowCount(0);
+            try {
+                connect.selectFromTabla("SELECT* FROM vehiculos;",dtmResult);
+            } catch (SQLException ex) {
+                Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+            }  
+        }else if (buscarPor == "Por cliente"){
+            String [] cabecera = {"DNI","Nombre","Apellido 1","Apellido 2","F.nacimiento","Nacionalidad","Telefono","Mail"};
+            dtmResult.setColumnIdentifiers(cabecera);
+            dtmResult.setRowCount(0);
+            try {
+                connect.selectFromTabla("SELECT* FROM clientes;",dtmResult);
+            } catch (SQLException ex) {
+                Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }else{
+            String [] cabecera = {"Nº parcela","Disponible"};
+            dtmResult.setColumnIdentifiers(cabecera);
+            dtmResult.setRowCount(0);
+            try {
+                connect.selectFromTabla("SELECT* FROM parcelas;",dtmResult);
+            } catch (SQLException ex) {
+                Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        
+        
     }
 
     @SuppressWarnings("unchecked")
@@ -163,9 +245,32 @@ public class Interfaz extends javax.swing.JFrame {
         btnGuardarVehiculo = new javax.swing.JButton();
         jLabel6 = new javax.swing.JLabel();
         pnlGestion = new javax.swing.JPanel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        tblResult = new javax.swing.JTable();
+        cbSeleccion = new javax.swing.JComboBox<>();
+        btnBuscar = new javax.swing.JButton();
         pnlMapa = new javax.swing.JPanel();
+        btnImportar = new javax.swing.JButton();
+        lblImagen = new javax.swing.JLabel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        pnlBotones = new javax.swing.JPanel();
         pnlAlertas = new javax.swing.JPanel();
         pnlDatos = new javax.swing.JPanel();
+        pnlDatosArea = new javax.swing.JPanel();
+        tfEmailArea = new javax.swing.JTextField();
+        tfNParcelas = new javax.swing.JTextField();
+        tfPagWeb = new javax.swing.JTextField();
+        lblPrecioNoche = new javax.swing.JLabel();
+        tfprecioNoche = new javax.swing.JTextField();
+        lblRellena = new javax.swing.JLabel();
+        lblDireccion = new javax.swing.JLabel();
+        lblTelefono1 = new javax.swing.JLabel();
+        lblEmail = new javax.swing.JLabel();
+        lblNPArcelas = new javax.swing.JLabel();
+        lblPagWeb = new javax.swing.JLabel();
+        tfDireccion = new javax.swing.JTextField();
+        tfTelefonoArea = new javax.swing.JTextField();
+        btnSiguiente = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -259,7 +364,7 @@ public class Interfaz extends javax.swing.JFrame {
         );
         pnlBienvenidaLayout.setVerticalGroup(
             pnlBienvenidaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 670, Short.MAX_VALUE)
+            .addGap(0, 700, Short.MAX_VALUE)
         );
 
         tpnlPantallas.addTab("bienv", pnlBienvenida);
@@ -424,29 +529,60 @@ public class Interfaz extends javax.swing.JFrame {
 
         tpnlPantallas.addTab("reg", pnlRegistro);
 
-        javax.swing.GroupLayout pnlGestionLayout = new javax.swing.GroupLayout(pnlGestion);
-        pnlGestion.setLayout(pnlGestionLayout);
-        pnlGestionLayout.setHorizontalGroup(
-            pnlGestionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1110, Short.MAX_VALUE)
-        );
-        pnlGestionLayout.setVerticalGroup(
-            pnlGestionLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 670, Short.MAX_VALUE)
-        );
+        pnlGestion.setBackground(new java.awt.Color(0, 153, 204));
+        pnlGestion.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        tblResult.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {},
+                {},
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane2.setViewportView(tblResult);
+
+        pnlGestion.add(jScrollPane2, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 120, 890, 480));
+
+        cbSeleccion.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        cbSeleccion.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Por vehiculo", "Por cliente", "Por parcela" }));
+        cbSeleccion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbSeleccionActionPerformed(evt);
+            }
+        });
+        pnlGestion.add(cbSeleccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 40, 120, 30));
+
+        btnBuscar.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        btnBuscar.setText("Buscar");
+        btnBuscar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarActionPerformed(evt);
+            }
+        });
+        pnlGestion.add(btnBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(220, 40, -1, 30));
 
         tpnlPantallas.addTab("ges", pnlGestion);
 
-        javax.swing.GroupLayout pnlMapaLayout = new javax.swing.GroupLayout(pnlMapa);
-        pnlMapa.setLayout(pnlMapaLayout);
-        pnlMapaLayout.setHorizontalGroup(
-            pnlMapaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1110, Short.MAX_VALUE)
-        );
-        pnlMapaLayout.setVerticalGroup(
-            pnlMapaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 670, Short.MAX_VALUE)
-        );
+        pnlMapa.setBackground(new java.awt.Color(0, 153, 204));
+        pnlMapa.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        btnImportar.setText("Importar mapa");
+        btnImportar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnImportarActionPerformed(evt);
+            }
+        });
+        pnlMapa.add(btnImportar, new org.netbeans.lib.awtextra.AbsoluteConstraints(28, 23, 134, 42));
+        pnlMapa.add(lblImagen, new org.netbeans.lib.awtextra.AbsoluteConstraints(28, 83, 710, 400));
+
+        pnlBotones.setLayout(new java.awt.GridLayout());
+        jScrollPane1.setViewportView(pnlBotones);
+
+        pnlMapa.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 490, 850, 120));
 
         tpnlPantallas.addTab("mapa", pnlMapa);
 
@@ -458,12 +594,63 @@ public class Interfaz extends javax.swing.JFrame {
         );
         pnlAlertasLayout.setVerticalGroup(
             pnlAlertasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 670, Short.MAX_VALUE)
+            .addGap(0, 700, Short.MAX_VALUE)
         );
 
         tpnlPantallas.addTab("aler", pnlAlertas);
 
         pnlDatos.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        pnlDatosArea.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        pnlDatosArea.add(tfEmailArea, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 180, 230, -1));
+        pnlDatosArea.add(tfNParcelas, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 260, 230, -1));
+        pnlDatosArea.add(tfPagWeb, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 220, 230, -1));
+
+        lblPrecioNoche.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
+        lblPrecioNoche.setText("€/noche:");
+        pnlDatosArea.add(lblPrecioNoche, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 300, -1, -1));
+        pnlDatosArea.add(tfprecioNoche, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 300, 230, -1));
+
+        lblRellena.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
+        lblRellena.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblRellena.setText("Por favor rellena todos los datos de tu área");
+        pnlDatosArea.add(lblRellena, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 40, -1, -1));
+
+        lblDireccion.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
+        lblDireccion.setText("Dirección:");
+        pnlDatosArea.add(lblDireccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, -1, -1));
+
+        lblTelefono1.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
+        lblTelefono1.setText("Teléfono:");
+        pnlDatosArea.add(lblTelefono1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 140, -1, -1));
+
+        lblEmail.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
+        lblEmail.setText("E-mail:");
+        pnlDatosArea.add(lblEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 180, -1, -1));
+
+        lblNPArcelas.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
+        lblNPArcelas.setText("Nº parcelas:");
+        pnlDatosArea.add(lblNPArcelas, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 260, -1, -1));
+
+        lblPagWeb.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
+        lblPagWeb.setText("Página web:");
+        pnlDatosArea.add(lblPagWeb, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 220, -1, -1));
+        pnlDatosArea.add(tfDireccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 100, 230, -1));
+        pnlDatosArea.add(tfTelefonoArea, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 140, 230, -1));
+
+        btnSiguiente.setBackground(new java.awt.Color(0, 0, 0));
+        btnSiguiente.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        btnSiguiente.setForeground(new java.awt.Color(255, 255, 255));
+        btnSiguiente.setText("Siguiente");
+        btnSiguiente.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSiguienteActionPerformed(evt);
+            }
+        });
+        pnlDatosArea.add(btnSiguiente, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 410, -1, 30));
+
+        pnlDatos.add(pnlDatosArea, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 440, 490));
+
         tpnlPantallas.addTab("dato", pnlDatos);
 
         getContentPane().add(tpnlPantallas, new org.netbeans.lib.awtextra.AbsoluteConstraints(337, 0, 1110, -1));
@@ -485,16 +672,11 @@ public class Interfaz extends javax.swing.JFrame {
 
     private void btnGuardarVehiculoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarVehiculoActionPerformed
         // TODO add your handling code here:
-        Parcela parcela = crearParcela();
-        Vehiculo vehiculo = crearVehiculo();
+        parcela = crearParcela();
+        vehiculo = crearVehiculo();
         vehiculo.setParcela(parcela);
         
         ConexionBBDD conexion = new ConexionBBDD();
-        /*String insertVehiculo = "INSERT INTO vehiculos (matricula, marca, modelo, num_ocupantes, check_in, check_out)"
-                + "VALUES ('"+vehiculo.getMatricula()+"','"+vehiculo.getMarca()+"','"+vehiculo.getModelo()+"',"+vehiculo.getNumOcupantes()+",'"
-                + conexion.fechaSQL(vehiculo.getCheckIn())+"','"+conexion.fechaSQL(vehiculo.getCheckOut())+"');";
-        String insertParcela = "INSERT INTO parcelas (num_parcela, disponibilidad)"
-                + "VALUES ("+parcela.getNumParcela()+","+parcela.isDisponible()+");";*/
         try {
             conexion.insertInTabla(vehiculo.toSQL());
             conexion.insertInTabla(parcela.toSQL());
@@ -515,7 +697,6 @@ public class Interfaz extends javax.swing.JFrame {
         dcCheckOut.setEnabled(false);
         cbOcupantes.setEnabled(false);
         cbParcela.setEnabled(false);
-
     }//GEN-LAST:event_btnGuardarVehiculoActionPerformed
 
     private void tfDNIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfDNIActionPerformed
@@ -529,48 +710,20 @@ public class Interfaz extends javax.swing.JFrame {
 
         //o hago una consulta a la BD para obtener nº de ocupantes y con eso relleno variable
         Cliente cliente = crearCliente();
+        clientes.add(cliente);
         lblCliente.setText("Cliente "+contador);
-        System.out.println("matricula: "+matricula);
+        System.out.println("matricula: "+vehiculo.getMatricula());
         cambiarAVehiculos();
-        /*if ((contador-1) >= contadorMax){
-            pnlClientes.setVisible(false);
-            JOptionPane.showMessageDialog(null, "Todos los clientes del vehículo " +matricula+" han sido guardados" );
-            
-            tfMatricula.setEnabled(true);
-            tfMarca.setEnabled(true);
-            tfModelo.setEnabled(true);
-            dcCheckIn.setEnabled(true);
-            dcCheckOut.setEnabled(true);
-            cbOcupantes.setEnabled(true);
-            cbParcela.setEnabled(true);
-
-            //Limpio todos los campos de la interfaz
-            tfMatricula.setText(null);
-            tfMarca.setText(null);
-            tfModelo.setText(null);
-            dcCheckIn.setDate(null);
-            dcCheckOut.setDate(null);
-            cbOcupantes.setSelectedIndex(0);
-            cbParcela.setSelectedIndex(0);
-            
-        }*/
+        vehiculo.setClientes(clientes);
         contador ++;
         
         ConexionBBDD conexion = new ConexionBBDD();
-        String insertCliente = "INSERT INTO clientes (dni, nombre, apellido1, apellido2, fecha_nac, nacionalidad, telefono, mail)"
-                + "VALUES ('"+cliente.getDni()+"','"+cliente.getNombre()+"','"+cliente.getApellido1()+"','"+cliente.getApellido2()+"','"
-                + conexion.fechaSQL(cliente.getFechaNac())+"','"+cliente.getNacionalidad()+"',"+cliente.getTelefono()+",'"+cliente.getMail()+"');";
         try {
-            conexion.insertInTabla(insertCliente);  
+            conexion.insertInTabla(cliente.toSQL());  
         } catch (SQLException ex) {
             Logger.getLogger(InterfazOld.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("fallo al insertar el vehiculo en la BD");
         }
-        /*Cliente cliente1 = crearCliente();
-        System.out.println(cliente1.toString());
-        Set<Cliente>clientesEnVehiculo = new HashSet<Cliente>();
-        clientesEnVehiculo.add(cliente1);
-        System.out.println(clientesEnVehiculo.toString());*/
 
         //Limpio todos los campos de la interfaz
         tfDNI.setText(null);
@@ -595,6 +748,7 @@ public class Interfaz extends javax.swing.JFrame {
 
     private void pnlBtnMapaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlBtnMapaMouseClicked
         tpnlPantallas.setSelectedIndex(3);
+        aniadirBotones();
     }//GEN-LAST:event_pnlBtnMapaMouseClicked
 
     private void pnlBtnAlertasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlBtnAlertasMouseClicked
@@ -604,6 +758,44 @@ public class Interfaz extends javax.swing.JFrame {
     private void pnlBtnInfoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlBtnInfoMouseClicked
         tpnlPantallas.setSelectedIndex(5);
     }//GEN-LAST:event_pnlBtnInfoMouseClicked
+
+    private void btnImportarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportarActionPerformed
+        //Coloca la imagen seleccionada con el metodo seleccionarImagen en una etiqueta
+        String pathMapa = seleccionarImagen(); //Guardo la ruta del archivo
+        insertarImagen (lblImagen, pathMapa);
+
+    }//GEN-LAST:event_btnImportarActionPerformed
+
+    private void cbSeleccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbSeleccionActionPerformed
+        // TODO add your handling code here:
+        buscarPor = cbSeleccion.getSelectedItem(); //guardo el nombre que está seleccionado cuando presiono btnAnadir
+        
+    }//GEN-LAST:event_cbSeleccionActionPerformed
+
+    private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
+        try {
+            llenarTablaBuscar();
+        } catch (SQLException ex) {
+            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+    }//GEN-LAST:event_btnBuscarActionPerformed
+
+    private void btnSiguienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSiguienteActionPerformed
+        /* Al pulsar boton se establece la conexión con la BD y se añaden a la tabla Area los datos del cuestionario
+        Ademas se pasa a la siguiente pantalla*/
+        ConexionBBDD connect = new ConexionBBDD();
+        miArea = crearArea();
+        /*String insert = "INSERT INTO area (direccion,telefono,mail,web,num_parcelas,precio_noche) VALUES (\""+tfDireccion.getText()+"\","+Integer.valueOf(tfTelefono.getText())+",\""
+        + tfEmail.getText()+"\",\""+tfPagWeb.getText()+"\","+Integer.valueOf(tfNParcelas.getText())+","+Integer.valueOf(tfprecioNoche.getText())+");";*/
+        try {
+            connect.insertInTabla(miArea.toSQL());
+        } catch (SQLException ex) {
+            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+      
+    }//GEN-LAST:event_btnSiguienteActionPerformed
 
     
     public static void main(String args[]) {
@@ -634,15 +826,20 @@ public class Interfaz extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Interfaz().setVisible(true);
+                
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnGuardarCliente;
     private javax.swing.JButton btnGuardarVehiculo;
+    private javax.swing.JButton btnImportar;
+    private javax.swing.JButton btnSiguiente;
     private javax.swing.JComboBox<String> cbOcupantes;
     private javax.swing.JComboBox<String> cbParcela;
+    private javax.swing.JComboBox<String> cbSeleccion;
     private com.toedter.calendar.JDateChooser dcCheckIn;
     private com.toedter.calendar.JDateChooser dcCheckOut;
     private com.toedter.calendar.JDateChooser dcFechaNac;
@@ -652,26 +849,37 @@ public class Interfaz extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JLabel lblApellido1;
     private javax.swing.JLabel lblApellido2;
     private javax.swing.JLabel lblCheckIn;
     private javax.swing.JLabel lblCheckOut;
     private javax.swing.JLabel lblCliente;
     private javax.swing.JLabel lblDNI;
+    private javax.swing.JLabel lblDireccion;
+    private javax.swing.JLabel lblEmail;
     private javax.swing.JLabel lblFechaNac;
+    private javax.swing.JLabel lblImagen;
     private javax.swing.JLabel lblMail;
     private javax.swing.JLabel lblMarca;
     private javax.swing.JLabel lblMatricula;
     private javax.swing.JLabel lblMenu;
     private javax.swing.JLabel lblModelo;
+    private javax.swing.JLabel lblNPArcelas;
     private javax.swing.JLabel lblNacionalidad;
     private javax.swing.JLabel lblNombre;
     private javax.swing.JLabel lblOcupantes;
+    private javax.swing.JLabel lblPagWeb;
     private javax.swing.JLabel lblParcela;
+    private javax.swing.JLabel lblPrecioNoche;
+    private javax.swing.JLabel lblRellena;
     private javax.swing.JLabel lblTelefono;
+    private javax.swing.JLabel lblTelefono1;
     private javax.swing.JLabel lblTitulo;
     private javax.swing.JPanel pnlAlertas;
     private javax.swing.JPanel pnlBienvenida;
+    private javax.swing.JPanel pnlBotones;
     private javax.swing.JPanel pnlBtnAlertas;
     private javax.swing.JPanel pnlBtnGestion;
     private javax.swing.JPanel pnlBtnInfo;
@@ -679,20 +887,28 @@ public class Interfaz extends javax.swing.JFrame {
     private javax.swing.JPanel pnlBtnRegistro;
     private javax.swing.JPanel pnlClientes;
     private javax.swing.JPanel pnlDatos;
+    private javax.swing.JPanel pnlDatosArea;
     private javax.swing.JPanel pnlGestion;
     private javax.swing.JPanel pnlMapa;
     private javax.swing.JPanel pnlRegistro;
     private javax.swing.JPanel pnlVehiculos;
+    private javax.swing.JTable tblResult;
     private javax.swing.JTextField tfApellido1;
     private javax.swing.JTextField tfApellido2;
     private javax.swing.JTextField tfDNI;
+    private javax.swing.JTextField tfDireccion;
+    private javax.swing.JTextField tfEmailArea;
     private javax.swing.JTextField tfMail;
     private javax.swing.JTextField tfMarca;
     private javax.swing.JTextField tfMatricula;
     private javax.swing.JTextField tfModelo;
+    private javax.swing.JTextField tfNParcelas;
     private javax.swing.JTextField tfNacionalidad;
     private javax.swing.JTextField tfNombre;
+    private javax.swing.JTextField tfPagWeb;
     private javax.swing.JTextField tfTelefono;
+    private javax.swing.JTextField tfTelefonoArea;
+    private javax.swing.JTextField tfprecioNoche;
     private javax.swing.JTabbedPane tpnlPantallas;
     // End of variables declaration//GEN-END:variables
 }

@@ -7,11 +7,15 @@ package clasesJava;
 import java.sql.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
 
-
+//Meter todos los not null y las FK
 
 public class ConexionBBDD { //Ver en Eclipse M06 Acceso a datos VT05 el ejemplo
         
@@ -63,7 +67,7 @@ public class ConexionBBDD { //Ver en Eclipse M06 Acceso a datos VT05 el ejemplo
                 + "modelo VARCHAR (15),"
                 + "num_ocupantes INT NOT NULL,"
                 + "check_in DATE NOT NULL,"
-                + "check_out DATE);";
+                + "check_out DATE);"; 
         sentencia.executeUpdate(crearTablaVehiculos);
         System.out.println("tabla vehiculos creada");
                 
@@ -128,21 +132,48 @@ public class ConexionBBDD { //Ver en Eclipse M06 Acceso a datos VT05 el ejemplo
         }
     }
     
-    //Método para realizar consultas en las tablas mediante un string
-    public ResultSet selectFromTabla (String select)throws SQLException{
-        ResultSet result;
+    //Método para realizar consultas en las tablas de la BD y colocarlas en una Jtable
+    public void selectFromTabla(String select,DefaultTableModel dtm)throws SQLException{
         try (Connection connect = DriverManager.getConnection(BBDD,USER,PASSWORD); Statement sentencia = connect.createStatement()) {
-                    sentencia.executeUpdate("USE furgoGestion;");
-            result = sentencia.executeQuery(select);
-            sentencia.executeUpdate(select);
-            System.out.println("se han seleccionado los datos correctamente");
-            sentencia.close();
-            connect.close();
-            return result;
+            sentencia.executeUpdate("USE furgoGestion;");
+            try (ResultSet resultado = sentencia.executeQuery(select)) {
+                ResultSetMetaData rsmd = resultado.getMetaData();
+                while (resultado.next()){
+                    System.out.println("Se crea resultset con los resultados");
+                    Object [] vector = new Object[rsmd.getColumnCount()];
+                    for (int i = 0; i < rsmd.getColumnCount(); i++) {
+                        vector[i] = resultado.getString(i+1);
+                    }
+                    dtm.addRow(vector);
+                    }
+                resultado.close();
+                }
+        sentencia.close();
+        connect.close();
         }
-      
     }
     
+    //Método para realizar consultas en las tablas de la BD y colocarlas en TextFields
+    public void selectFromTabla(String select,JTextField tf)throws SQLException{
+        try (Connection connect = DriverManager.getConnection(BBDD,USER,PASSWORD); Statement sentencia = connect.createStatement()) {
+            sentencia.executeUpdate("USE furgoGestion;");
+            try (ResultSet resultado = sentencia.executeQuery(select)) {
+                ResultSetMetaData rsmd = resultado.getMetaData();
+                while (resultado.next()){
+                    System.out.println("Se crea resultset con los resultados");
+                    Object [] vector = new Object[rsmd.getColumnCount()];
+                    for (int i = 0; i < rsmd.getColumnCount(); i++) {
+                        vector[i] = resultado.getString(i+1);
+                    }
+                    tf.setText(Arrays.toString(vector));
+                    }
+                resultado.close();
+                }
+        sentencia.close();
+        connect.close();
+        }
+    }  
+     
     //Método para convertir una fecha en formato java.util.Date a un String válido para "date" en MySQL
     public String fechaSQL (java.util.Date fechaJava){
         DateFormat dateFormat = new SimpleDateFormat ("yyyy-MM-dd");

@@ -107,6 +107,12 @@ public class Area {
     public void setInformacion(File informacion) {
         this.informacion = informacion;
     }
+    
+    public String toSQL(){
+        String insertArea = "INSERT INTO area (direccion,telefono,mail,web,num_parcelas,precio_noche) VALUES (\""+getDireccion()+"\","+getTelefono()+",\""
+        + getMail()+"\",\""+getWeb()+"\","+getNumParcelas()+","+getPrecioNoche()+");";
+        return insertArea;
+    }
 
     @Override
     public String toString() {

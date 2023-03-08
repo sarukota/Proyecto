@@ -98,7 +98,11 @@ public class Cliente {
     }
     
     public String toSQL(){
-        
+        ConexionBBDD conexion = new ConexionBBDD();
+        String insertCliente = "INSERT INTO clientes (dni, nombre, apellido1, apellido2, fecha_nac, nacionalidad, telefono, mail)"
+                + "VALUES ('"+getDni()+"','"+getNombre()+"','"+getApellido1()+"','"+getApellido2()+"','"
+                + conexion.fechaSQL(getFechaNac())+"','"+getNacionalidad()+"',"+getTelefono()+",'"+getMail()+"');";
+        return insertCliente;
     }
 
     @Override

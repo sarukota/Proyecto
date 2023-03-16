@@ -6,33 +6,34 @@ package clasesJava;
 
 import java.io.File;
 import java.util.ArrayList;
-import javax.swing.Icon;
-
+import java.util.Arrays;
 
 public class Area {
-    
+    //Variables coincidentes con la BBDD
     private String direccion;
     private int telefono;
     private String mail;
     private String web;
     private int numParcelas;
     private int precioNoche;
-    ArrayList<Servicio> Servicios = new ArrayList<>();
-    private Icon mapa;
-    private File informacion;
+    private String pathMapa;
+    private File informacion; //convertir a String con el path del fichero
+    //Variables solo de la clase para ser usadas por el programa
+    private ArrayList<Servicio> Servicios = new ArrayList<>(); //Convertir a Array
+    private Parcela [] parcelas;
 
     public Area(){
         
     }
 
-    public Area(String direccion, int telefono, String mail, String web, int numParcelas, int precioNoche, Icon mapa, File informacion) {
+    public Area(String direccion, int telefono, String mail, String web, int numParcelas, int precioNoche, String mapa, File informacion) {
         this.direccion = direccion;
         this.telefono = telefono;
         this.mail = mail;
         this.web = web;
         this.numParcelas = numParcelas;
         this.precioNoche = precioNoche;
-        this.mapa = mapa;
+        this.pathMapa = mapa;
         this.informacion = informacion;
     }
 
@@ -92,12 +93,12 @@ public class Area {
         this.Servicios = Servicios;
     }
 
-    public Icon getMapa() {
-        return mapa;
+    public String getPathMapa() {
+        return pathMapa;
     }
 
-    public void setMapa(Icon mapa) {
-        this.mapa = mapa;
+    public void setPathMapa(String mapa) {
+        this.pathMapa = mapa;
     }
 
     public File getInformacion() {
@@ -108,6 +109,15 @@ public class Area {
         this.informacion = informacion;
     }
     
+    public void asignarParcelas(){
+        Parcela [] parcela = new Parcela[getNumParcelas()];
+        for (int i = 0; i < getNumParcelas(); i++) {
+            parcela[i].setNumParcela(i+1);
+            parcela[i].setDisponible(true);
+        }
+        Arrays.toString(parcela);
+    }
+    
     public String toSQL(){
         String insertArea = "INSERT INTO area (direccion,telefono,mail,web,num_parcelas,precio_noche) VALUES (\""+getDireccion()+"\","+getTelefono()+",\""
         + getMail()+"\",\""+getWeb()+"\","+getNumParcelas()+","+getPrecioNoche()+");";
@@ -116,7 +126,7 @@ public class Area {
 
     @Override
     public String toString() {
-        return "Area{" + "direccion=" + direccion + ", telefono=" + telefono + ", mail=" + mail + ", web=" + web + ", numParcelas=" + numParcelas + ", precioNoche=" + precioNoche + ", Servicios=" + Servicios + ", mapa=" + mapa + ", informacion=" + informacion + '}';
+        return "Area{" + "direccion=" + direccion + ", telefono=" + telefono + ", mail=" + mail + ", web=" + web + ", numParcelas=" + numParcelas + ", precioNoche=" + precioNoche + ", Servicios=" + Servicios + ", mapa=" + pathMapa + ", informacion=" + informacion + '}';
     }
 
     

@@ -7,6 +7,7 @@ package clasesJava;
 import java.util.Date;
 
 public class Cliente {
+    
     private String dni; //puede ser documento de identidad de otro pais
     private String nombre;
     private String apellido1;
@@ -15,13 +16,14 @@ public class Cliente {
     private String nacionalidad;
     private int telefono;
     private String mail;
+    private String matriculaAuto;
 	
     public Cliente() {
 		
     }
 	
     public Cliente(String dni, String nombre, String apellido1, String apellido2, Date fecha_nacimiento, 
-            String nacionalidad, int telefono, String mail) {
+            String nacionalidad, int telefono, String mail, String matriculaAuto) {
         super();
         this.dni = dni;
         this.nombre = nombre;
@@ -31,6 +33,7 @@ public class Cliente {
         this.nacionalidad = nacionalidad;
         this.telefono = telefono;
         this.mail = mail;
+        this.matriculaAuto = matriculaAuto;
     }
 
     public String getDni() {
@@ -96,18 +99,26 @@ public class Cliente {
     public void setMail(String mail) {
         this.mail = mail;
     }
+
+    public String getMatriculaAuto() {
+        return matriculaAuto;
+    }
+
+    public void setMatriculaAuto(String matriculaAuto) {
+        this.matriculaAuto = matriculaAuto;
+    }
     
     public String toSQL(){
         ConexionBBDD conexion = new ConexionBBDD();
-        String insertCliente = "INSERT INTO clientes (dni, nombre, apellido1, apellido2, fecha_nac, nacionalidad, telefono, mail)"
+        String insertCliente = "INSERT INTO clientes (dni, nombre, apellido1, apellido2, fecha_nac, nacionalidad, telefono, mail, matricula)"
                 + "VALUES ('"+getDni()+"','"+getNombre()+"','"+getApellido1()+"','"+getApellido2()+"','"
-                + conexion.fechaSQL(getFechaNac())+"','"+getNacionalidad()+"',"+getTelefono()+",'"+getMail()+"');";
+                + conexion.fechaSQL(getFechaNac())+"','"+getNacionalidad()+"',"+getTelefono()+",'"+getMail()+"','"+getMatriculaAuto()+"');";
         return insertCliente;
     }
 
     @Override
     public String toString() {
-        return "Cliente{" + "dni=" + dni + ", nombre=" + nombre + ", apellido1=" + apellido1 + ", apellido2=" + apellido2 + ", fechaNac=" + fechaNac + ", nacionalidad=" + nacionalidad + ", telefono=" + telefono + ", mail=" + mail + '}';
+        return "Cliente{" + "dni=" + dni + ", nombre=" + nombre + ", apellido1=" + apellido1 + ", apellido2=" + apellido2 + ", fechaNac=" + fechaNac + ", nacionalidad=" + nacionalidad + ", telefono=" + telefono + ", mail=" + mail + ", matriculaAuto=" + matriculaAuto + '}';
     }
-    
+
 }

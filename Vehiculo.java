@@ -6,34 +6,33 @@ package clasesJava;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Date;
-import java.util.Set;
 import javax.swing.JOptionPane;
 
 public class Vehiculo {
+    
     private String matricula;
     private String marca;
     private String modelo;
     private int numOcupantes;
+    private int numParcela;
     private Date checkIn;
     private Date checkOut;
-    private Parcela parcela;
-    private Set <Cliente> clientes;
-	
+    private String tituloAlerta;
+ 	
     public Vehiculo() {
 		
     }
 
-    public Vehiculo(String matricula, String marca, String modelo, int numOcupantes, Date checkIn, Date checkOut, Parcela parcela, Set<Cliente> clientes) {
+    public Vehiculo(String matricula, String marca, String modelo, int numOcupantes, int numParcela, Date checkIn, Date checkOut, String tituloAlerta) {
         this.matricula = matricula;
         this.marca = marca;
         this.modelo = modelo;
         this.numOcupantes = numOcupantes;
+        this.numParcela = numParcela;
         this.checkIn = checkIn;
         this.checkOut = checkOut;
-        this.parcela = parcela;
-        this.clientes = clientes;
+        this.tituloAlerta = tituloAlerta;
     }
 
     public String getMatricula() {
@@ -68,6 +67,14 @@ public class Vehiculo {
         this.numOcupantes = numOcupantes;
     }
 
+    public int getNumParcela() {
+        return numParcela;
+    }
+
+    public void setNumParcela(int numParcela) {
+        this.numParcela = numParcela;
+    }
+
     public Date getCheckIn() {
         return checkIn;
     }
@@ -84,22 +91,14 @@ public class Vehiculo {
         this.checkOut = checkOut;
     }
 
-    public Parcela getParcela() {
-        return parcela;
+    public String getTituloAlerta() {
+        return tituloAlerta;
     }
 
-    public void setParcela(Parcela parcela) {
-        this.parcela = parcela;
+    public void setTituloAlerta(String tituloAlerta) {
+        this.tituloAlerta = tituloAlerta;
     }
 
-    public Set<Cliente> getClientes() {
-        return clientes;
-    }
-
-    public void setClientes(Set<Cliente> clientes) {
-        this.clientes = clientes;
-    }
-    
     private void calculoFactura(Area miArea){
         DateFormat fechaCorta = new SimpleDateFormat ("dd-MM-aaaa");
         Date fechaEmision = new Date(System.currentTimeMillis());
@@ -112,16 +111,19 @@ public class Vehiculo {
     
     public String toSQL(){
         ConexionBBDD conexion = new ConexionBBDD();
-        String insertVehiculo = "INSERT INTO vehiculos (matricula, marca, modelo, num_ocupantes, check_in, check_out)"
-                + "VALUES ('"+getMatricula()+"','"+getMarca()+"','"+getModelo()+"',"+getNumOcupantes()+",'"
-                + conexion.fechaSQL(getCheckIn())+"','"+conexion.fechaSQL(getCheckOut())+"');";
+        String insertVehiculo = "INSERT INTO vehiculos (matricula, marca, modelo, num_ocupantes, num_parcela, check_in, check_out, titulo_alerta)"
+                + "VALUES ('"+getMatricula()+"','"+getMarca()+"','"+getModelo()+"',"+getNumOcupantes()+","
+                + getNumParcela()+",'"+conexion.fechaSQL(getCheckIn())+"','"+conexion.fechaSQL(getCheckOut())+"','"+getTituloAlerta()+"');";
         return insertVehiculo;
     }
 
     @Override
     public String toString() {
-        return "Vehiculo{" + "matricula=" + matricula + ", marca=" + marca + ", modelo=" + modelo + ", numOcupantes=" + numOcupantes + ", checkIn=" + checkIn + ", checkOut=" + checkOut + ", parcela=" + parcela + ", clientes=" + clientes + '}';
+        return "Vehiculo{" + "matricula=" + matricula + ", marca=" + marca + ", modelo=" + modelo + ", numOcupantes=" + numOcupantes + ", numParcela=" + numParcela + ", checkIn=" + checkIn + ", checkOut=" + checkOut + ", tituloAlerta=" + tituloAlerta + '}';
     }
+
+    
+    
     
     
     

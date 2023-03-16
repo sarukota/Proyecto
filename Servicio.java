@@ -33,6 +33,11 @@ public class Servicio {
     public void setPrecio(int precio) {
         this.precio = precio;
     }
+    
+    public String toSQL(){
+        String insert = "INSERT INTO servicios (nombre,precio) VALUES (\""+getNombre()+"\","+getPrecio()+");";
+        return insert;
+    }
 
     @Override
     public String toString() {

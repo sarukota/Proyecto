@@ -4,6 +4,7 @@
  */
 package clasesJava;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Image;
 import java.sql.*;
@@ -17,15 +18,17 @@ public class Interfaz extends javax.swing.JFrame {
     
     Area miArea;
     Vehiculo vehiculo;
-    Cliente cliente;
-    Parcela parcela;
+    //Cliente cliente;
+    //Parcela parcela;
     Alerta alerta;
     Servicio servicio;
     Set <Cliente> clientes = new HashSet<>();
     DefaultTableModel dtmResult = new DefaultTableModel(); //instancio un modelo de tabla
-    ArrayList<Servicio> listaDatos = new ArrayList<>(); //Creo un array para añadir servicios
     Object buscarPor; //Creo un objeto para determinar la busqueda
-    
+    DefaultTableModel dtmServicios = new DefaultTableModel(); //instancio un modelo de tabla
+    ArrayList<Servicio> listaServicios = new ArrayList<>(); //Creo un array para añadir servicios
+    Object servicioEscogido; //Creo un objeto para determinar el srv escogido
+    ConexionBBDD conexion = new ConexionBBDD();
     
     int contador = 2; //Contador para cambiar label de clientes
 
@@ -58,23 +61,22 @@ public class Interfaz extends javax.swing.JFrame {
         vehiculo.setMatricula(tfMatricula.getText());
         vehiculo.setMarca(tfMarca.getText());
         vehiculo.setModelo(tfModelo.getText());
+        vehiculo.setNumParcela(Integer.parseInt(cbParcela.getSelectedItem().toString()));
+        try {
+            conexion.UpdateBd("UPDATE parcelas SET disponibilidad=false WHERE num_parcela ="+vehiculo.getNumParcela()+";");
+        } catch (SQLException ex) {
+            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+        }
         vehiculo.setCheckIn(dcCheckIn.getDate());
         vehiculo.setCheckOut(dcCheckOut.getDate());
-        vehiculo.setNumOcupantes (Integer.parseInt(cbOcupantes.getSelectedItem().toString())); //parseo el objeto recogido por el comboBox a int
+        vehiculo.setTituloAlerta("Salida del vehículo "+vehiculo.getMatricula());
+        vehiculo.setNumOcupantes(Integer.parseInt(cbOcupantes.getSelectedItem().toString())); //parseo el objeto recogido por el comboBox a int
         return vehiculo;
-    }
-    
-    //se instancia una nueva parcela con los datos de los campos
-    public Parcela crearParcela(){
-        parcela = new Parcela();
-        parcela.setNumParcela(Integer.parseInt(cbParcela.getSelectedItem().toString()));
-        parcela.setDisponible(false);
-        return parcela;
     }
     
     //Método para crear un nuevo cliente con los datos del cuestionario
     public Cliente crearCliente(){
-        cliente = new Cliente();
+        Cliente cliente = new Cliente();
         cliente.setDni(tfDNI.getText());
         cliente.setNacionalidad(tfNacionalidad.getText());
         cliente.setNombre(tfNombre.getText());
@@ -83,6 +85,7 @@ public class Interfaz extends javax.swing.JFrame {
         cliente.setFechaNac(dcFechaNac.getDate());
         cliente.setTelefono(Integer.parseInt(tfTelefono.getText()));
         cliente.setMail(tfMail.getText());
+        cliente.setMatriculaAuto(tfMatricula.getText());
         return cliente;
     }
     
@@ -157,7 +160,7 @@ public class Interfaz extends javax.swing.JFrame {
         buscarPor = cbSeleccion.getSelectedItem(); //guardo el tipo de busqueda que está seleccionada 
         ConexionBBDD connect = new ConexionBBDD();
         if (buscarPor == "Por vehiculo"){
-            String [] cabecera = {"Matricula","Marca","Modelo","NºOcupantes","Check in","Check out"};
+            String [] cabecera = {"Matricula","Marca","Modelo","NºOcupantes","NºParcela","Check in","Check out",};
             dtmResult.setColumnIdentifiers(cabecera);
             tblResult.setModel(dtmResult);
             dtmResult.setRowCount(0);
@@ -167,7 +170,7 @@ public class Interfaz extends javax.swing.JFrame {
                 Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
             }  
         }else if (buscarPor == "Por cliente"){
-            String [] cabecera = {"DNI","Nombre","Apellido 1","Apellido 2","F.nacimiento","Nacionalidad","Telefono","Mail"};
+            String [] cabecera = {"DNI","Nombre","Apellido 1","Apellido 2","F.nacimiento","Nacionalidad","Telefono","Mail","Matricula auto"};
             dtmResult.setColumnIdentifiers(cabecera);
             dtmResult.setRowCount(0);
             try {
@@ -184,9 +187,40 @@ public class Interfaz extends javax.swing.JFrame {
             } catch (SQLException ex) {
                 Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
             }
+        }    
+    }
+    
+      //metodo para definir el modelo de la tabla
+    private void setMdlTblServicios(){
+        String [] cabecera = {"Servicio","Precio" };
+        dtmServicios.setColumnIdentifiers(cabecera);
+        tblServicios.setModel(dtmServicios);
+    }
+    
+    //método para rellenar el arrayList de servicios, si escojo otro srv se rellenará con el campo de debajo
+    private void llenarArrayServicios(){
+        String nombre;
+        int precio = Integer.parseInt(tfPrecio.getText());
+        if (servicioEscogido == "Otro servicio"){
+            nombre = tfOtroServicio.getText();
+        }else{
+            nombre = cbServicios.getSelectedItem().toString();
         }
-        
-        
+        Servicio srv = new Servicio(nombre,precio);
+        listaServicios.add(srv);
+        System.out.println("Se ha rellenado el array servicios");
+    }
+    
+    //metodo para mostrar los datos de los servicios en la tabla de la interfaz
+    private void llenarTblServicios(){
+        Object [] datos = new Object[dtmServicios.getColumnCount()];
+        dtmServicios.setRowCount(0);
+        for (Servicio srv : listaServicios) {
+            datos[0] = srv.getNombre();
+            datos[1] = srv.getPrecio();
+            dtmServicios.addRow(datos);
+        }
+        tblServicios.setModel(dtmServicios);
     }
 
     @SuppressWarnings("unchecked")
@@ -255,6 +289,28 @@ public class Interfaz extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         pnlBotones = new javax.swing.JPanel();
         pnlAlertas = new javax.swing.JPanel();
+        jScrollPane4 = new javax.swing.JScrollPane();
+        jPanel2 = new javax.swing.JPanel();
+        jLabel9 = new javax.swing.JLabel();
+        jLabel12 = new javax.swing.JLabel();
+        jScrollPane8 = new javax.swing.JScrollPane();
+        tblHoy = new javax.swing.JTable();
+        jLabel13 = new javax.swing.JLabel();
+        jScrollPane7 = new javax.swing.JScrollPane();
+        tblManiana = new javax.swing.JTable();
+        jScrollPane6 = new javax.swing.JScrollPane();
+        tblSiguientes = new javax.swing.JTable();
+        jButton1 = new javax.swing.JButton();
+        pnlNuevaAlerta = new javax.swing.JPanel();
+        tfTituloAlerta = new javax.swing.JTextField();
+        jScrollPane5 = new javax.swing.JScrollPane();
+        taDescripcionAlerta = new javax.swing.JTextArea();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        jLabel11 = new javax.swing.JLabel();
+        btnGuardarAlerta = new javax.swing.JButton();
+        dcDiaAlerta = new com.toedter.calendar.JDateChooser();
+        jLabel14 = new javax.swing.JLabel();
         pnlDatos = new javax.swing.JPanel();
         pnlDatosArea = new javax.swing.JPanel();
         tfEmailArea = new javax.swing.JTextField();
@@ -270,7 +326,22 @@ public class Interfaz extends javax.swing.JFrame {
         lblPagWeb = new javax.swing.JLabel();
         tfDireccion = new javax.swing.JTextField();
         tfTelefonoArea = new javax.swing.JTextField();
-        btnSiguiente = new javax.swing.JButton();
+        btnGuardarArea = new javax.swing.JButton();
+        btnEditarDatos = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JSeparator();
+        jPanel1 = new javax.swing.JPanel();
+        lbl€ = new javax.swing.JLabel();
+        btnAnadir = new javax.swing.JButton();
+        tfOtroServicio = new javax.swing.JTextField();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        tblServicios = new javax.swing.JTable();
+        lblRellena1 = new javax.swing.JLabel();
+        cbServicios = new javax.swing.JComboBox<>();
+        tfPrecio = new javax.swing.JTextField();
+        btnGuardarServicios = new javax.swing.JButton();
+        btnEliminarTodo = new javax.swing.JButton();
+        spNotas = new javax.swing.JScrollPane();
+        jTextArea1 = new javax.swing.JTextArea();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -364,7 +435,7 @@ public class Interfaz extends javax.swing.JFrame {
         );
         pnlBienvenidaLayout.setVerticalGroup(
             pnlBienvenidaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 700, Short.MAX_VALUE)
+            .addGap(0, 704, Short.MAX_VALUE)
         );
 
         tpnlPantallas.addTab("bienv", pnlBienvenida);
@@ -422,7 +493,7 @@ public class Interfaz extends javax.swing.JFrame {
 
         btnGuardarCliente.setFont(new java.awt.Font("Rockwell Nova", 1, 16)); // NOI18N
         btnGuardarCliente.setText("Guardar cliente");
-        btnGuardarCliente.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        btnGuardarCliente.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnGuardarCliente.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnGuardarClienteActionPerformed(evt);
@@ -493,16 +564,9 @@ public class Interfaz extends javax.swing.JFrame {
         lblParcela.setText("Parcela:");
         pnlVehiculos.add(lblParcela, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 420, -1, -1));
 
-        cbParcela.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
         cbParcela.setMaximumSize(new java.awt.Dimension(70, 20));
         cbParcela.setMinimumSize(new java.awt.Dimension(70, 20));
         cbParcela.setPreferredSize(new java.awt.Dimension(70, 20));
-        /*if (cbLuz.isSelected()){
-            cbParcela.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6" }));
-        }else{
-            cbParcela.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12" }));
-        }*/
-
         cbParcela.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbParcelaActionPerformed(evt);
@@ -512,7 +576,7 @@ public class Interfaz extends javax.swing.JFrame {
 
         btnGuardarVehiculo.setFont(new java.awt.Font("Rockwell Nova", 1, 16)); // NOI18N
         btnGuardarVehiculo.setText("Guardar vehiculo");
-        btnGuardarVehiculo.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
+        btnGuardarVehiculo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnGuardarVehiculo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnGuardarVehiculoActionPerformed(evt);
@@ -570,6 +634,9 @@ public class Interfaz extends javax.swing.JFrame {
         pnlMapa.setBackground(new java.awt.Color(0, 153, 204));
         pnlMapa.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        btnImportar.setBackground(new java.awt.Color(0, 0, 0));
+        btnImportar.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
+        btnImportar.setForeground(new java.awt.Color(255, 255, 255));
         btnImportar.setText("Importar mapa");
         btnImportar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -579,77 +646,305 @@ public class Interfaz extends javax.swing.JFrame {
         pnlMapa.add(btnImportar, new org.netbeans.lib.awtextra.AbsoluteConstraints(28, 23, 134, 42));
         pnlMapa.add(lblImagen, new org.netbeans.lib.awtextra.AbsoluteConstraints(28, 83, 710, 400));
 
-        pnlBotones.setLayout(new java.awt.GridLayout());
+        pnlBotones.setLayout(new java.awt.GridLayout(1, 0));
         jScrollPane1.setViewportView(pnlBotones);
 
         pnlMapa.add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 490, 850, 120));
 
         tpnlPantallas.addTab("mapa", pnlMapa);
 
+        jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        jLabel9.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        jLabel9.setText("Hoy:");
+        jPanel2.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 43, 51, -1));
+
+        jLabel12.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        jLabel12.setText("Siguientes:");
+        jPanel2.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 538, 86, -1));
+
+        tblHoy.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {},
+                {},
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane8.setViewportView(tblHoy);
+
+        jPanel2.add(jScrollPane8, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 72, 477, 226));
+
+        jLabel13.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        jLabel13.setText("Mañana:");
+        jPanel2.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 316, 77, -1));
+
+        tblManiana.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {},
+                {},
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane7.setViewportView(tblManiana);
+
+        jPanel2.add(jScrollPane7, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 351, 477, 157));
+
+        tblSiguientes.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {},
+                {},
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane6.setViewportView(tblSiguientes);
+
+        jPanel2.add(jScrollPane6, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 567, 477, 157));
+
+        jScrollPane4.setViewportView(jPanel2);
+
+        jButton1.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        jButton1.setText("Nueva alerta");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
+        pnlNuevaAlerta.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+        pnlNuevaAlerta.add(tfTituloAlerta, new org.netbeans.lib.awtextra.AbsoluteConstraints(26, 41, 250, -1));
+
+        taDescripcionAlerta.setColumns(20);
+        taDescripcionAlerta.setRows(5);
+        jScrollPane5.setViewportView(taDescripcionAlerta);
+
+        pnlNuevaAlerta.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 210, 250, 144));
+
+        jLabel7.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        jLabel7.setText("Título:");
+        pnlNuevaAlerta.add(jLabel7, new org.netbeans.lib.awtextra.AbsoluteConstraints(26, 12, -1, -1));
+
+        jLabel10.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        jLabel10.setText("Día aviso:");
+        pnlNuevaAlerta.add(jLabel10, new org.netbeans.lib.awtextra.AbsoluteConstraints(26, 75, -1, -1));
+
+        jLabel11.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        jLabel11.setText("Descripción:");
+        pnlNuevaAlerta.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 170, -1, -1));
+
+        btnGuardarAlerta.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        btnGuardarAlerta.setText("Guardar");
+        btnGuardarAlerta.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGuardarAlertaActionPerformed(evt);
+            }
+        });
+        pnlNuevaAlerta.add(btnGuardarAlerta, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 400, 96, 30));
+        pnlNuevaAlerta.add(dcDiaAlerta, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 110, 240, -1));
+
+        jLabel14.setFont(new java.awt.Font("Rockwell Nova", 1, 14)); // NOI18N
+        jLabel14.setText("ALERTAS");
+
         javax.swing.GroupLayout pnlAlertasLayout = new javax.swing.GroupLayout(pnlAlertas);
         pnlAlertas.setLayout(pnlAlertasLayout);
         pnlAlertasLayout.setHorizontalGroup(
             pnlAlertasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1110, Short.MAX_VALUE)
+            .addGroup(pnlAlertasLayout.createSequentialGroup()
+                .addGap(625, 625, 625)
+                .addComponent(jLabel14, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
+            .addGroup(pnlAlertasLayout.createSequentialGroup()
+                .addGap(38, 38, 38)
+                .addGroup(pnlAlertasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlAlertasLayout.createSequentialGroup()
+                        .addGap(27, 27, 27)
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(pnlNuevaAlerta, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(34, 34, 34)
+                .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 561, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
         pnlAlertasLayout.setVerticalGroup(
             pnlAlertasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 700, Short.MAX_VALUE)
+            .addGroup(pnlAlertasLayout.createSequentialGroup()
+                .addGap(24, 24, 24)
+                .addComponent(jLabel14)
+                .addGap(12, 12, 12)
+                .addGroup(pnlAlertasLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlAlertasLayout.createSequentialGroup()
+                        .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(15, 15, 15)
+                        .addComponent(pnlNuevaAlerta, javax.swing.GroupLayout.PREFERRED_SIZE, 490, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 592, javax.swing.GroupLayout.PREFERRED_SIZE)))
         );
 
         tpnlPantallas.addTab("aler", pnlAlertas);
 
         pnlDatos.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        pnlDatosArea.setBackground(new java.awt.Color(0, 153, 204));
         pnlDatosArea.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        pnlDatosArea.add(tfEmailArea, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 180, 230, -1));
-        pnlDatosArea.add(tfNParcelas, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 260, 230, -1));
-        pnlDatosArea.add(tfPagWeb, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 220, 230, -1));
+        pnlDatosArea.add(tfEmailArea, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 160, 230, -1));
+        pnlDatosArea.add(tfNParcelas, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 240, 230, -1));
+        pnlDatosArea.add(tfPagWeb, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 200, 230, -1));
 
         lblPrecioNoche.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
         lblPrecioNoche.setText("€/noche:");
-        pnlDatosArea.add(lblPrecioNoche, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 300, -1, -1));
-        pnlDatosArea.add(tfprecioNoche, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 300, 230, -1));
+        pnlDatosArea.add(lblPrecioNoche, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 280, -1, -1));
+        pnlDatosArea.add(tfprecioNoche, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 280, 230, -1));
 
         lblRellena.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
         lblRellena.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblRellena.setText("Por favor rellena todos los datos de tu área");
-        pnlDatosArea.add(lblRellena, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 40, -1, -1));
+        lblRellena.setText("Datos del área:");
+        pnlDatosArea.add(lblRellena, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 30, 450, -1));
 
         lblDireccion.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
         lblDireccion.setText("Dirección:");
-        pnlDatosArea.add(lblDireccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, -1, -1));
+        pnlDatosArea.add(lblDireccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 80, -1, -1));
 
         lblTelefono1.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
         lblTelefono1.setText("Teléfono:");
-        pnlDatosArea.add(lblTelefono1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 140, -1, -1));
+        pnlDatosArea.add(lblTelefono1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 120, -1, -1));
 
         lblEmail.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
         lblEmail.setText("E-mail:");
-        pnlDatosArea.add(lblEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 180, -1, -1));
+        pnlDatosArea.add(lblEmail, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 160, -1, -1));
 
         lblNPArcelas.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
         lblNPArcelas.setText("Nº parcelas:");
-        pnlDatosArea.add(lblNPArcelas, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 260, -1, -1));
+        pnlDatosArea.add(lblNPArcelas, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 240, -1, -1));
 
         lblPagWeb.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
         lblPagWeb.setText("Página web:");
-        pnlDatosArea.add(lblPagWeb, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 220, -1, -1));
-        pnlDatosArea.add(tfDireccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 100, 230, -1));
-        pnlDatosArea.add(tfTelefonoArea, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 140, 230, -1));
+        pnlDatosArea.add(lblPagWeb, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 200, -1, -1));
+        pnlDatosArea.add(tfDireccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 80, 230, -1));
+        pnlDatosArea.add(tfTelefonoArea, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 120, 230, -1));
 
-        btnSiguiente.setBackground(new java.awt.Color(0, 0, 0));
-        btnSiguiente.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
-        btnSiguiente.setForeground(new java.awt.Color(255, 255, 255));
-        btnSiguiente.setText("Siguiente");
-        btnSiguiente.addActionListener(new java.awt.event.ActionListener() {
+        btnGuardarArea.setBackground(new java.awt.Color(0, 0, 0));
+        btnGuardarArea.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        btnGuardarArea.setForeground(new java.awt.Color(255, 255, 255));
+        btnGuardarArea.setText("Guardar");
+        btnGuardarArea.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnGuardarArea.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSiguienteActionPerformed(evt);
+                btnGuardarAreaActionPerformed(evt);
             }
         });
-        pnlDatosArea.add(btnSiguiente, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 410, -1, 30));
+        pnlDatosArea.add(btnGuardarArea, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 330, 100, 30));
 
-        pnlDatos.add(pnlDatosArea, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 0, 440, 490));
+        btnEditarDatos.setBackground(new java.awt.Color(0, 0, 0));
+        btnEditarDatos.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        btnEditarDatos.setForeground(new java.awt.Color(255, 255, 255));
+        btnEditarDatos.setText("Editar");
+        btnEditarDatos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEditarDatos.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEditarDatosActionPerformed(evt);
+            }
+        });
+        pnlDatosArea.add(btnEditarDatos, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 330, 100, 30));
+
+        jSeparator1.setOrientation(javax.swing.SwingConstants.VERTICAL);
+        pnlDatosArea.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(437, -7, 20, 400));
+
+        pnlDatos.add(pnlDatosArea, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 390));
+
+        jPanel1.setBackground(new java.awt.Color(0, 153, 204));
+        jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        lbl€.setText("€");
+        jPanel1.add(lbl€, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 80, 20, 20));
+
+        btnAnadir.setBackground(new java.awt.Color(0, 0, 0));
+        btnAnadir.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        btnAnadir.setForeground(new java.awt.Color(255, 255, 255));
+        btnAnadir.setText("Añadir servicio");
+        btnAnadir.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnAnadir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAnadirActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnAnadir, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 110, 130, 30));
+        jPanel1.add(tfOtroServicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 110, 140, 30));
+
+        tblServicios.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {},
+                {},
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane3.setViewportView(tblServicios);
+
+        jPanel1.add(jScrollPane3, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 150, 430, 150));
+
+        lblRellena1.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
+        lblRellena1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblRellena1.setText("Servicios del área con precio extra:");
+        jPanel1.add(lblRellena1, new org.netbeans.lib.awtextra.AbsoluteConstraints(-10, 30, 500, -1));
+
+        cbServicios.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        cbServicios.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Pasajero extra", "Electricidad", "Llenado/vaciado", "mascota", "Lavadora", "Secadora", "Ficha", "Otro servicio" }));
+        cbServicios.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbServiciosActionPerformed(evt);
+            }
+        });
+        jPanel1.add(cbServicios, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 80, -1, -1));
+
+        tfPrecio.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                tfPrecioActionPerformed(evt);
+            }
+        });
+        jPanel1.add(tfPrecio, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 80, 60, -1));
+
+        btnGuardarServicios.setBackground(new java.awt.Color(0, 0, 0));
+        btnGuardarServicios.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        btnGuardarServicios.setForeground(new java.awt.Color(255, 255, 255));
+        btnGuardarServicios.setText("Guardar");
+        btnGuardarServicios.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnGuardarServicios.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnGuardarServiciosActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnGuardarServicios, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 330, 100, 30));
+
+        btnEliminarTodo.setBackground(new java.awt.Color(255, 0, 51));
+        btnEliminarTodo.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        btnEliminarTodo.setForeground(new java.awt.Color(255, 255, 255));
+        btnEliminarTodo.setText("Eliminar todo");
+        btnEliminarTodo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnEliminarTodo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEliminarTodoActionPerformed(evt);
+            }
+        });
+        jPanel1.add(btnEliminarTodo, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 330, 130, 30));
+
+        pnlDatos.add(jPanel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 0, 500, 390));
+
+        jTextArea1.setColumns(20);
+        jTextArea1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jTextArea1.setRows(5);
+        spNotas.setViewportView(jTextArea1);
+
+        pnlDatos.add(spNotas, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 390, 950, 260));
 
         tpnlPantallas.addTab("dato", pnlDatos);
 
@@ -672,21 +967,19 @@ public class Interfaz extends javax.swing.JFrame {
 
     private void btnGuardarVehiculoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarVehiculoActionPerformed
         // TODO add your handling code here:
-        parcela = crearParcela();
+        ConexionBBDD connection = new ConexionBBDD();
         vehiculo = crearVehiculo();
-        vehiculo.setParcela(parcela);
-        
-        ConexionBBDD conexion = new ConexionBBDD();
+        alerta = new Alerta(vehiculo.getTituloAlerta(),null,vehiculo.getCheckOut());
         try {
-            conexion.insertInTabla(vehiculo.toSQL());
-            conexion.insertInTabla(parcela.toSQL());
+            connection.UpdateBd(alerta.toSQL());
+            connection.UpdateBd(vehiculo.toSQL());
+            JOptionPane.showMessageDialog(null,"Se ha cargado el vehiculo correctamente"); 
         } catch (SQLException ex) {
             Logger.getLogger(InterfazOld.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("fallo al insertar el vehiculo en la BD");
         }
        
         System.out.println(vehiculo.toString());
-        System.out.println("numero ocupantes" + vehiculo.getNumOcupantes());
         
         //Desabilita los componentes al introducir el vehiculo y habilita el panel Clientes
         pnlClientes.setVisible(true);
@@ -700,7 +993,7 @@ public class Interfaz extends javax.swing.JFrame {
     }//GEN-LAST:event_btnGuardarVehiculoActionPerformed
 
     private void tfDNIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfDNIActionPerformed
-        // TODO add your handling code here:
+
     }//GEN-LAST:event_tfDNIActionPerformed
 
     private void btnGuardarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarClienteActionPerformed
@@ -714,12 +1007,10 @@ public class Interfaz extends javax.swing.JFrame {
         lblCliente.setText("Cliente "+contador);
         System.out.println("matricula: "+vehiculo.getMatricula());
         cambiarAVehiculos();
-        vehiculo.setClientes(clientes);
         contador ++;
         
-        ConexionBBDD conexion = new ConexionBBDD();
         try {
-            conexion.insertInTabla(cliente.toSQL());  
+            conexion.UpdateBd(cliente.toSQL());
         } catch (SQLException ex) {
             Logger.getLogger(InterfazOld.class.getName()).log(Level.SEVERE, null, ex);
             System.out.println("fallo al insertar el vehiculo en la BD");
@@ -740,6 +1031,10 @@ public class Interfaz extends javax.swing.JFrame {
     private void pnlBtnRegistroMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlBtnRegistroMouseClicked
         tpnlPantallas.setSelectedIndex(1);
         pnlClientes.setVisible(false);
+        for (int i = 0; i < Integer.parseInt(tfNParcelas.getText()); i++) {
+           cbParcela.addItem(String.valueOf(i+1)); 
+        }
+        
     }//GEN-LAST:event_pnlBtnRegistroMouseClicked
 
     private void pnlBtnGestionMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlBtnGestionMouseClicked
@@ -753,15 +1048,50 @@ public class Interfaz extends javax.swing.JFrame {
 
     private void pnlBtnAlertasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlBtnAlertasMouseClicked
         tpnlPantallas.setSelectedIndex(4);
+        pnlNuevaAlerta.setVisible(false);
     }//GEN-LAST:event_pnlBtnAlertasMouseClicked
 
     private void pnlBtnInfoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlBtnInfoMouseClicked
         tpnlPantallas.setSelectedIndex(5);
+        setMdlTblServicios();
+        //Si existen datos en la BD. Poner condicional
+        //Se muestran en los campos y en la tabla
+        dtmServicios.setRowCount(0);
+        String selectServicio = "SELECT* FROM servicios;";
+        String selectArea = "SELECT* FROM area;";
+        JTextField[]tf = new JTextField[6];
+        tf[0]=tfDireccion;
+        tf[1]=tfTelefonoArea;
+        tf[2]=tfEmailArea;
+        tf[3]=tfPagWeb;
+        tf[4]=tfNParcelas;
+        tf[5]=tfprecioNoche;
+        
+        try {
+            conexion.selectFromTabla(selectServicio, dtmServicios);
+            conexion.selectFromTabla(selectArea, tf);
+        } catch (SQLException ex) {
+            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+        }finally{
+           tfOtroServicio.setEnabled(false);
+           tfDireccion.setEditable(false);
+           tfTelefonoArea.setEditable(false);
+           tfEmailArea.setEditable(false);
+           tfPagWeb.setEditable(false);
+           tfNParcelas.setEditable(false);
+           tfprecioNoche.setEditable(false);
+           btnGuardarArea.setVisible(false);
+           btnEditarDatos.setVisible(true);
+        }
+        
+        
     }//GEN-LAST:event_pnlBtnInfoMouseClicked
 
     private void btnImportarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportarActionPerformed
         //Coloca la imagen seleccionada con el metodo seleccionarImagen en una etiqueta
+        //Añadir funcionalidad: si en la BD pathMapa tiene datos, meter esos datos en el label
         String pathMapa = seleccionarImagen(); //Guardo la ruta del archivo
+        miArea.setPathMapa(pathMapa);
         insertarImagen (lblImagen, pathMapa);
 
     }//GEN-LAST:event_btnImportarActionPerformed
@@ -781,24 +1111,120 @@ public class Interfaz extends javax.swing.JFrame {
 
     }//GEN-LAST:event_btnBuscarActionPerformed
 
-    private void btnSiguienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSiguienteActionPerformed
+    private void btnGuardarAreaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarAreaActionPerformed
         /* Al pulsar boton se establece la conexión con la BD y se añaden a la tabla Area los datos del cuestionario
         Ademas se pasa a la siguiente pantalla*/
-        ConexionBBDD connect = new ConexionBBDD();
-        miArea = crearArea();
-        /*String insert = "INSERT INTO area (direccion,telefono,mail,web,num_parcelas,precio_noche) VALUES (\""+tfDireccion.getText()+"\","+Integer.valueOf(tfTelefono.getText())+",\""
-        + tfEmail.getText()+"\",\""+tfPagWeb.getText()+"\","+Integer.valueOf(tfNParcelas.getText())+","+Integer.valueOf(tfprecioNoche.getText())+");";*/
-        try {
-            connect.insertInTabla(miArea.toSQL());
-        } catch (SQLException ex) {
-            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+        //Añadir funciones: si la tabla Area está vacia hacer insert, si no esta vacia hacer update de área
+        if(tfDireccion.getText().length()==0|tfNParcelas.getText().length()==0|tfprecioNoche.getText().length()==0){
+            tfDireccion.setBackground(Color.red);
+            tfNParcelas.setBackground(Color.red);
+            tfprecioNoche.setBackground(Color.red);
+            JOptionPane.showMessageDialog(null,"Por favor rellene los campos obligatorios");
+        }else{
+            tfDireccion.setBackground(Color.white);
+            tfNParcelas.setBackground(Color.white);
+            tfprecioNoche.setBackground(Color.white);
+            miArea = crearArea();
+            try {
+                conexion.UpdateBd(miArea.toSQL());
+                for (int i = 0; i < miArea.getNumParcelas(); i++) {  
+                Parcela parcela = new Parcela (i+1,true);
+                    System.out.println("parcela "+parcela);
+                conexion.UpdateBd(parcela.toSQL());
+                }
+                JOptionPane.showMessageDialog(null,"Se han actualizado los datos con éxito");
+                tfDireccion.setEditable(false);
+                tfTelefonoArea.setEditable(false);
+                tfEmailArea.setEditable(false);
+                tfPagWeb.setEditable(false);
+                tfNParcelas.setEditable(false);
+                tfprecioNoche.setEditable(false);
+                btnGuardarArea.setVisible(false);
+                btnEditarDatos.setVisible(true);
+                
+            } catch (SQLException ex) {
+                Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         
       
-    }//GEN-LAST:event_btnSiguienteActionPerformed
+    }//GEN-LAST:event_btnGuardarAreaActionPerformed
+
+    private void btnAnadirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAnadirActionPerformed
+        llenarArrayServicios();
+        llenarTblServicios();
+    }//GEN-LAST:event_btnAnadirActionPerformed
+
+    private void cbServiciosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbServiciosActionPerformed
+        // TODO add your handling code here:
+        servicioEscogido = cbServicios.getSelectedItem(); //guardo el nombre que está seleccionado cuando presiono btnAnadir
+        if (servicioEscogido == "Otro servicio"){
+            tfOtroServicio.setEnabled(true);
+        }else{
+            tfOtroServicio.setEnabled(false);
+        }
+    }//GEN-LAST:event_cbServiciosActionPerformed
+
+    private void tfPrecioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfPrecioActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_tfPrecioActionPerformed
+
+    private void btnGuardarServiciosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarServiciosActionPerformed
+        for (Servicio srv : listaServicios) {
+            String insert = "INSERT INTO servicios (nombre,precio) VALUES (\""+srv.getNombre()+"\","+srv.getPrecio()+");";
+            try {
+                conexion.UpdateBd(insert);
+                JOptionPane.showMessageDialog(null,"Se han actualizado los datos con éxito");
+            } catch (SQLException ex) {
+                Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+            }
+            
+        }
+        miArea.setServicios(listaServicios);
+        listaServicios.toString();
+
+    }//GEN-LAST:event_btnGuardarServiciosActionPerformed
+
+    private void btnEliminarTodoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEliminarTodoActionPerformed
+        Object[] opciones = { "ACEPTAR", "CANCELAR" };
+        JOptionPane panelAviso = new JOptionPane();
+        panelAviso.showOptionDialog(null, "Se eliminarán los datos", "Confirmación",JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, opciones, opciones[0]);
+        System.out.println("opciones "+opciones[0] );
+        System.out.println("valor panel  "+panelAviso.getValue().toString() ); //el valor cuando se inicia el condicional es null, ver como cambiarlo
+        if (panelAviso.getValue()==opciones[0]){
+            System.out.println("has seleccionado aceptar");
+            dtmServicios.setRowCount(0);
+            try {
+                conexion.UpdateBd("DELETE FROM servicios;");
+            } catch (SQLException ex) {
+                Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+ 
+    }//GEN-LAST:event_btnEliminarTodoActionPerformed
+
+    private void btnEditarDatosActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarDatosActionPerformed
+        tfDireccion.setEditable(true);
+        tfTelefonoArea.setEditable(true);
+        tfEmailArea.setEditable(true);
+        tfPagWeb.setEditable(true);
+        tfNParcelas.setEditable(true);
+        tfprecioNoche.setEditable(true);
+        btnGuardarArea.setVisible(true);
+        btnEditarDatos.setVisible(false);
+    }//GEN-LAST:event_btnEditarDatosActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        pnlNuevaAlerta.setVisible(true);
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void btnGuardarAlertaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarAlertaActionPerformed
+        alerta = new Alerta(tfTituloAlerta.getText(),taDescripcionAlerta.getText(),dcDiaAlerta.getDate());
+    }//GEN-LAST:event_btnGuardarAlertaActionPerformed
 
     
     public static void main(String args[]) {
+
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -823,34 +1249,73 @@ public class Interfaz extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
+        
+        //Se crea la BD con las tablas correspondientes
+        ConexionBBDD connect = new ConexionBBDD();
+        try {
+            connect.crearTablas();
+            System.out.println("Se ha conectado correctamente a la BD");
+        } catch (SQLException ex) {
+            System.err.println("No se ha podido conectar al servidor SQL");
+            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        //Corre la interfaz
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Interfaz().setVisible(true);
                 
             }
         });
+        
+        
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton btnAnadir;
     private javax.swing.JButton btnBuscar;
+    private javax.swing.JButton btnEditarDatos;
+    private javax.swing.JButton btnEliminarTodo;
+    private javax.swing.JButton btnGuardarAlerta;
+    private javax.swing.JButton btnGuardarArea;
     private javax.swing.JButton btnGuardarCliente;
+    private javax.swing.JButton btnGuardarServicios;
     private javax.swing.JButton btnGuardarVehiculo;
     private javax.swing.JButton btnImportar;
-    private javax.swing.JButton btnSiguiente;
     private javax.swing.JComboBox<String> cbOcupantes;
     private javax.swing.JComboBox<String> cbParcela;
     private javax.swing.JComboBox<String> cbSeleccion;
+    private javax.swing.JComboBox<String> cbServicios;
     private com.toedter.calendar.JDateChooser dcCheckIn;
     private com.toedter.calendar.JDateChooser dcCheckOut;
+    private com.toedter.calendar.JDateChooser dcDiaAlerta;
     private com.toedter.calendar.JDateChooser dcFechaNac;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
+    private javax.swing.JLabel jLabel12;
+    private javax.swing.JLabel jLabel13;
+    private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
+    private javax.swing.JScrollPane jScrollPane4;
+    private javax.swing.JScrollPane jScrollPane5;
+    private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JScrollPane jScrollPane7;
+    private javax.swing.JScrollPane jScrollPane8;
+    private javax.swing.JSeparator jSeparator1;
+    private javax.swing.JTextArea jTextArea1;
     private javax.swing.JLabel lblApellido1;
     private javax.swing.JLabel lblApellido2;
     private javax.swing.JLabel lblCheckIn;
@@ -874,9 +1339,11 @@ public class Interfaz extends javax.swing.JFrame {
     private javax.swing.JLabel lblParcela;
     private javax.swing.JLabel lblPrecioNoche;
     private javax.swing.JLabel lblRellena;
+    private javax.swing.JLabel lblRellena1;
     private javax.swing.JLabel lblTelefono;
     private javax.swing.JLabel lblTelefono1;
     private javax.swing.JLabel lblTitulo;
+    private javax.swing.JLabel lbl€;
     private javax.swing.JPanel pnlAlertas;
     private javax.swing.JPanel pnlBienvenida;
     private javax.swing.JPanel pnlBotones;
@@ -890,9 +1357,16 @@ public class Interfaz extends javax.swing.JFrame {
     private javax.swing.JPanel pnlDatosArea;
     private javax.swing.JPanel pnlGestion;
     private javax.swing.JPanel pnlMapa;
+    private javax.swing.JPanel pnlNuevaAlerta;
     private javax.swing.JPanel pnlRegistro;
     private javax.swing.JPanel pnlVehiculos;
+    private javax.swing.JScrollPane spNotas;
+    private javax.swing.JTextArea taDescripcionAlerta;
+    private javax.swing.JTable tblHoy;
+    private javax.swing.JTable tblManiana;
     private javax.swing.JTable tblResult;
+    private javax.swing.JTable tblServicios;
+    private javax.swing.JTable tblSiguientes;
     private javax.swing.JTextField tfApellido1;
     private javax.swing.JTextField tfApellido2;
     private javax.swing.JTextField tfDNI;
@@ -905,9 +1379,12 @@ public class Interfaz extends javax.swing.JFrame {
     private javax.swing.JTextField tfNParcelas;
     private javax.swing.JTextField tfNacionalidad;
     private javax.swing.JTextField tfNombre;
+    private javax.swing.JTextField tfOtroServicio;
     private javax.swing.JTextField tfPagWeb;
+    private javax.swing.JTextField tfPrecio;
     private javax.swing.JTextField tfTelefono;
     private javax.swing.JTextField tfTelefonoArea;
+    private javax.swing.JTextField tfTituloAlerta;
     private javax.swing.JTextField tfprecioNoche;
     private javax.swing.JTabbedPane tpnlPantallas;
     // End of variables declaration//GEN-END:variables

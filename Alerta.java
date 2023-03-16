@@ -45,6 +45,13 @@ public class Alerta {
     public void setDia(Date dia) {
         this.dia = dia;
     }
+    
+    public String toSQL(){
+        ConexionBBDD conexion = new ConexionBBDD();
+        String insertAlerta ="INSERT INTO alertas (titulo,descripcion,dia_alerta) VALUES("
+                + "'"+getTitulo()+"','"+getDescripción()+"','"+conexion.fechaSQL(getDia())+"');";
+        return insertAlerta;
+    }
 
     @Override
     public String toString() {

@@ -10,16 +10,16 @@ public class Alerta {
     
     private String titulo;
     private String descripción;
-    private Date dia;
+    private Date diaAviso;
 
     public Alerta(){
         
     }
     
-    public Alerta(String titulo, String descripción, Date dia) {
+    public Alerta(String titulo, String descripción, Date diaAviso) {
         this.titulo = titulo;
         this.descripción = descripción;
-        this.dia = dia;
+        this.diaAviso = diaAviso;
     }
 
     public String getTitulo() {
@@ -38,24 +38,24 @@ public class Alerta {
         this.descripción = descripción;
     }
 
-    public Date getDia() {
-        return dia;
+    public Date getDiaAviso() {
+        return diaAviso;
     }
 
-    public void setDia(Date dia) {
-        this.dia = dia;
+    public void setDiaAviso(Date dia) {
+        this.diaAviso = dia;
     }
     
     public String toSQL(){
         ConexionBBDD conexion = new ConexionBBDD();
         String insertAlerta ="INSERT INTO alertas (titulo,descripcion,dia_alerta) VALUES("
-                + "'"+getTitulo()+"','"+getDescripción()+"','"+conexion.fechaSQL(getDia())+"');";
+                + "'"+getTitulo()+"','"+getDescripción()+"','"+conexion.fechaSQL(getDiaAviso())+"');";
         return insertAlerta;
     }
 
     @Override
     public String toString() {
-        return "Alerta{" + "titulo=" + titulo + ", descripci\u00f3n=" + descripción + ", dia=" + dia + '}';
+        return "Alerta{" + "titulo=" + titulo + ", descripci\u00f3n=" + descripción + ", diaAviso=" + diaAviso + '}';
     }
     
     

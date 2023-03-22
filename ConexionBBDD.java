@@ -11,6 +11,7 @@ import java.util.Arrays;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+import jdk.internal.util.ArraysSupport;
 
 //Meter todos los not null y las FK
 
@@ -91,12 +92,12 @@ public class ConexionBBDD { //Ver en Eclipse M06 Acceso a datos VT05 el ejemplo
         
         String crearTablaVehiculos="CREATE TABLE IF NOT EXISTS Vehiculos ("
                 + "matricula VARCHAR (10) PRIMARY KEY NOT NULL,"
-                + "marca VARCHAR (15) NOT NULL,"
+                + "marca VARCHAR (15),"
                 + "modelo VARCHAR (15),"
                 + "num_ocupantes INT NOT NULL,"
                 + "num_parcela INT NOT NULL,"
                 + "check_in DATE NOT NULL,"
-                + "check_out DATE,"
+                + "check_out DATE NOT NULL,"
                 + "titulo_alerta VARCHAR (40) NOT NULL,"
                 + "FOREIGN KEY(titulo_alerta)references alertas(titulo),"
                 + "FOREIGN KEY(num_parcela)references parcelas(num_parcela));"; 
@@ -128,6 +129,22 @@ public class ConexionBBDD { //Ver en Eclipse M06 Acceso a datos VT05 el ejemplo
         sentencia.close();
 	connect.close();
 			
+    }
+    
+    //Método para devolver las filas de una tabla:
+    public int contarFilas (String consulta) throws SQLException{  
+        try (Connection connect = DriverManager.getConnection(BBDD,USER,PASSWORD); Statement sentencia = connect.createStatement()) {
+            sentencia.executeUpdate("USE furgoGestion;");
+            try (ResultSet resultado = sentencia.executeQuery(consulta)) {
+                while (resultado.next()){
+                    System.out.println("filas tabla ants de cerrar: "+resultado.getString(1));
+                    return Integer.parseInt(resultado.getString(1));
+                }
+            }
+            sentencia.close();
+            connect.close();
+        }
+        return 0;
     }
      
     //método para realizar updates (insert, delete) de datos en las tablas mediante un string
@@ -183,7 +200,29 @@ public class ConexionBBDD { //Ver en Eclipse M06 Acceso a datos VT05 el ejemplo
         connect.close();
         }
     }  
-     
+    
+    //Método que devuelve un array de string de un número de registros de una tabla
+    public String[]selectFromTabla(String select, int numRegistros)throws SQLException{
+        try (Connection connect = DriverManager.getConnection(BBDD,USER,PASSWORD); Statement sentencia = connect.createStatement()) {
+            sentencia.executeUpdate("USE furgoGestion;");
+            try (ResultSet resultado = sentencia.executeQuery(select)) {
+                ResultSetMetaData rsmd = resultado.getMetaData();
+                String[] datosTabla = new String[numRegistros];
+                int contador=0;
+                while (resultado.next()){ //mientras haya registros en la tabla
+                    datosTabla[contador] = resultado.getString(1);
+                    contador++;
+                }    
+                System.out.println("los datos de la tablas son: "+Arrays.toString(datosTabla));
+                resultado.close();
+                sentencia.close();
+                connect.close();
+                return datosTabla;    
+                          
+            }
+        }
+    }
+        
     //Método para convertir una fecha en formato java.util.Date a un String válido para "date" en MySQL
     public String fechaSQL (java.util.Date fechaJava){
         DateFormat dateFormat = new SimpleDateFormat ("yyyy-MM-dd");

@@ -23,7 +23,7 @@ public class Interfaz extends javax.swing.JFrame {
     Alerta alerta;
     Servicio servicio;
     Set <Cliente> clientes = new HashSet<>();
-    DefaultTableModel dtmResult = new DefaultTableModel(); //instancio un modelo de tabla
+    //DefaultTableModel dtmResult = new DefaultTableModel(); //instancio un modelo de tabla
     Object buscarPor; //Creo un objeto para determinar la busqueda
     DefaultTableModel dtmServicios = new DefaultTableModel(); //instancio un modelo de tabla
     ArrayList<Servicio> listaServicios = new ArrayList<>(); //Creo un array para añadir servicios
@@ -62,9 +62,10 @@ public class Interfaz extends javax.swing.JFrame {
         vehiculo.setMarca(tfMarca.getText());
         vehiculo.setModelo(tfModelo.getText());
         vehiculo.setNumParcela(Integer.parseInt(cbParcela.getSelectedItem().toString()));
+        //El siguiente bloque hace que al asignar una parcela al vehículo esta cambie su estado a ocupado
         try {
             conexion.UpdateBd("UPDATE parcelas SET disponibilidad=false WHERE num_parcela ="+vehiculo.getNumParcela()+";");
-        } catch (SQLException ex) {
+        }catch (SQLException ex) {
             Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
         }
         vehiculo.setCheckIn(dcCheckIn.getDate());
@@ -92,7 +93,7 @@ public class Interfaz extends javax.swing.JFrame {
     //Método para cambiar del frame Clientes al de vehiculos cuando ya se hayan introducido todos
     public void cambiarAVehiculos(){
         if ((contador-1) >= vehiculo.getNumOcupantes()){
-            pnlClientes.setVisible(false);
+            estadoInicialRegistro();
             JOptionPane.showMessageDialog(null, "Todos los clientes del vehículo " +vehiculo.getMatricula()+" han sido guardados" );
             
             tfMatricula.setEnabled(true);
@@ -154,36 +155,55 @@ public class Interfaz extends javax.swing.JFrame {
         pnlBotones.updateUI();
         
     }
+    
+    private void estadoInicialRegistro(){
+        pnlClientes.setVisible(false);
+        tfMatricula.setBackground(Color.white);
+        try {
+            String[] datosComboBox;
+            int numRegistros = conexion.contarFilas("SELECT COUNT(*) FROM parcelas where disponibilidad = true;");
+            datosComboBox = conexion.selectFromTabla("select num_parcela from parcelas where disponibilidad = true;",numRegistros);
+            cbParcela.removeAllItems();
+            for (int i = 0; i < (datosComboBox.length); i++) {
+            cbParcela.addItem(datosComboBox[i]); 
+        }
+        } catch (SQLException ex) {
+            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
    
     //metodo para definir el modelo y mostrar los datos de la BD en la tabla del panel de Gestion
     private void llenarTablaBuscar() throws SQLException{
         buscarPor = cbSeleccion.getSelectedItem(); //guardo el tipo de busqueda que está seleccionada 
         ConexionBBDD connect = new ConexionBBDD();
+        DefaultTableModel dtmResult = new DefaultTableModel();
         if (buscarPor == "Por vehiculo"){
             String [] cabecera = {"Matricula","Marca","Modelo","NºOcupantes","NºParcela","Check in","Check out",};
             dtmResult.setColumnIdentifiers(cabecera);
             tblResult.setModel(dtmResult);
             dtmResult.setRowCount(0);
             try {
-                connect.selectFromTabla("SELECT* FROM vehiculos;",dtmResult);
+                connect.selectFromTabla("SELECT matricula, marca, modelo, num_ocupantes, num_parcela, check_in, check_out FROM vehiculos;",dtmResult); 
             } catch (SQLException ex) {
                 Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
-            }  
+            } 
         }else if (buscarPor == "Por cliente"){
-            String [] cabecera = {"DNI","Nombre","Apellido 1","Apellido 2","F.nacimiento","Nacionalidad","Telefono","Mail","Matricula auto"};
+            String [] cabecera = {"DNI","Nombre","Apellido 1","Apellido 2","F.nacimiento","Nacionalidad","Telefono","Mail","Matricula auto",};
             dtmResult.setColumnIdentifiers(cabecera);
+            tblResult.setModel(dtmResult);
             dtmResult.setRowCount(0);
             try {
-                connect.selectFromTabla("SELECT* FROM clientes;",dtmResult);
+                connect.selectFromTabla("SELECT dni, nombre, apellido1, apellido2, fecha_nac, nacionalidad, telefono, mail, matricula FROM clientes;",dtmResult);
             } catch (SQLException ex) {
                 Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
             }
         }else{
-            String [] cabecera = {"Nº parcela","Disponible"};
+            String [] cabecera = {"Nº parcela","Disponible",};
             dtmResult.setColumnIdentifiers(cabecera);
+            tblResult.setModel(dtmResult);
             dtmResult.setRowCount(0);
             try {
-                connect.selectFromTabla("SELECT* FROM parcelas;",dtmResult);
+                connect.selectFromTabla("SELECT num_parcela, disponibilidad FROM parcelas;",dtmResult);
             } catch (SQLException ex) {
                 Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -435,7 +455,7 @@ public class Interfaz extends javax.swing.JFrame {
         );
         pnlBienvenidaLayout.setVerticalGroup(
             pnlBienvenidaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 704, Short.MAX_VALUE)
+            .addGap(0, 750, Short.MAX_VALUE)
         );
 
         tpnlPantallas.addTab("bienv", pnlBienvenida);
@@ -589,7 +609,7 @@ public class Interfaz extends javax.swing.JFrame {
         jLabel6.setText("Introduce los datos del vehículo:");
         pnlVehiculos.add(jLabel6, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 40, -1, -1));
 
-        pnlRegistro.add(pnlVehiculos, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 470, 670));
+        pnlRegistro.add(pnlVehiculos, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 970, 670));
 
         tpnlPantallas.addTab("reg", pnlRegistro);
 
@@ -653,6 +673,9 @@ public class Interfaz extends javax.swing.JFrame {
 
         tpnlPantallas.addTab("mapa", pnlMapa);
 
+        pnlAlertas.setBackground(new java.awt.Color(0, 153, 204));
+
+        jPanel2.setBackground(new java.awt.Color(0, 153, 204));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         jLabel9.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
@@ -660,7 +683,7 @@ public class Interfaz extends javax.swing.JFrame {
         jPanel2.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 43, 51, -1));
 
         jLabel12.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
-        jLabel12.setText("Siguientes:");
+        jLabel12.setText("Próximas:");
         jPanel2.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 538, 86, -1));
 
         tblHoy.setModel(new javax.swing.table.DefaultTableModel(
@@ -714,14 +737,18 @@ public class Interfaz extends javax.swing.JFrame {
 
         jScrollPane4.setViewportView(jPanel2);
 
+        jButton1.setBackground(new java.awt.Color(0, 0, 0));
         jButton1.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        jButton1.setForeground(new java.awt.Color(255, 255, 255));
         jButton1.setText("Nueva alerta");
+        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);
             }
         });
 
+        pnlNuevaAlerta.setBackground(new java.awt.Color(0, 153, 204));
         pnlNuevaAlerta.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         pnlNuevaAlerta.add(tfTituloAlerta, new org.netbeans.lib.awtextra.AbsoluteConstraints(26, 41, 250, -1));
 
@@ -743,8 +770,11 @@ public class Interfaz extends javax.swing.JFrame {
         jLabel11.setText("Descripción:");
         pnlNuevaAlerta.add(jLabel11, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 170, -1, -1));
 
+        btnGuardarAlerta.setBackground(new java.awt.Color(0, 0, 0));
         btnGuardarAlerta.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        btnGuardarAlerta.setForeground(new java.awt.Color(255, 255, 255));
         btnGuardarAlerta.setText("Guardar");
+        btnGuardarAlerta.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnGuardarAlerta.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnGuardarAlertaActionPerformed(evt);
@@ -969,27 +999,33 @@ public class Interfaz extends javax.swing.JFrame {
         // TODO add your handling code here:
         ConexionBBDD connection = new ConexionBBDD();
         vehiculo = crearVehiculo();
-        alerta = new Alerta(vehiculo.getTituloAlerta(),null,vehiculo.getCheckOut());
-        try {
-            connection.UpdateBd(alerta.toSQL());
-            connection.UpdateBd(vehiculo.toSQL());
-            JOptionPane.showMessageDialog(null,"Se ha cargado el vehiculo correctamente"); 
-        } catch (SQLException ex) {
-            Logger.getLogger(InterfazOld.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("fallo al insertar el vehiculo en la BD");
+        if(tfMatricula.getText().length()==0){
+            tfMatricula.setBackground(Color.red);
+            JOptionPane.showMessageDialog(null,"Por favor rellene los campos obligatorios");
+        }else{
+            tfMatricula.setBackground(Color.red);
+            alerta = new Alerta(vehiculo.getTituloAlerta(),null,vehiculo.getCheckOut());
+            try {
+                connection.UpdateBd(alerta.toSQL());
+                connection.UpdateBd(vehiculo.toSQL());
+                JOptionPane.showMessageDialog(null,"Se ha cargado el vehiculo correctamente"); 
+            } catch (SQLException ex) {
+                Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("fallo al insertar el vehiculo en la BD");
+            }
+
+            System.out.println(vehiculo.toString());
+
+            //Desabilita los componentes al introducir el vehiculo y habilita el panel Clientes
+            pnlClientes.setVisible(true);
+            tfMatricula.setEnabled(false);
+            tfMarca.setEnabled(false);
+            tfModelo.setEnabled(false);
+            dcCheckIn.setEnabled(false);
+            dcCheckOut.setEnabled(false);
+            cbOcupantes.setEnabled(false);
+            cbParcela.setEnabled(false);
         }
-       
-        System.out.println(vehiculo.toString());
-        
-        //Desabilita los componentes al introducir el vehiculo y habilita el panel Clientes
-        pnlClientes.setVisible(true);
-        tfMatricula.setEnabled(false);
-        tfMarca.setEnabled(false);
-        tfModelo.setEnabled(false);
-        dcCheckIn.setEnabled(false);
-        dcCheckOut.setEnabled(false);
-        cbOcupantes.setEnabled(false);
-        cbParcela.setEnabled(false);
     }//GEN-LAST:event_btnGuardarVehiculoActionPerformed
 
     private void tfDNIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfDNIActionPerformed
@@ -1003,37 +1039,59 @@ public class Interfaz extends javax.swing.JFrame {
 
         //o hago una consulta a la BD para obtener nº de ocupantes y con eso relleno variable
         Cliente cliente = crearCliente();
-        clientes.add(cliente);
-        lblCliente.setText("Cliente "+contador);
-        System.out.println("matricula: "+vehiculo.getMatricula());
-        cambiarAVehiculos();
-        contador ++;
-        
-        try {
-            conexion.UpdateBd(cliente.toSQL());
-        } catch (SQLException ex) {
-            Logger.getLogger(InterfazOld.class.getName()).log(Level.SEVERE, null, ex);
-            System.out.println("fallo al insertar el vehiculo en la BD");
+        if(tfDNI.getText().length()==0|tfNombre.getText().length()==0|tfApellido1.getText().length()==0|tfTelefono.getText().length()==0){
+            tfMatricula.setBackground(Color.red);
+            tfNombre.setBackground(Color.red);
+            tfApellido1.setBackground(Color.red);
+            tfTelefono.setBackground(Color.red);
+            JOptionPane.showMessageDialog(null,"Por favor rellene los campos obligatorios");
+        }else{
+            tfMatricula.setBackground(Color.white);
+            tfNombre.setBackground(Color.white);
+            tfApellido1.setBackground(Color.white);
+            tfTelefono.setBackground(Color.white);
+            tfMatricula.setBackground(Color.white);
+            clientes.add(cliente);
+            lblCliente.setText("Cliente "+contador);
+            System.out.println("matricula: "+vehiculo.getMatricula());
+            cambiarAVehiculos();
+            contador ++;
+
+            try {
+                conexion.UpdateBd(cliente.toSQL());
+            } catch (SQLException ex) {
+                Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+                System.out.println("fallo al insertar el vehiculo en la BD");
+            }
+
+            //Limpio todos los campos de la interfaz
+            tfDNI.setText(null);
+            tfNacionalidad.setText(null);
+            tfNombre.setText(null);
+            tfApellido1.setText(null);
+            tfApellido2.setText(null);
+            dcFechaNac.setDate(null);
+            tfTelefono.setText(null);
+            tfMail.setText(null);
         }
-
-        //Limpio todos los campos de la interfaz
-        tfDNI.setText(null);
-        tfNacionalidad.setText(null);
-        tfNombre.setText(null);
-        tfApellido1.setText(null);
-        tfApellido2.setText(null);
-        dcFechaNac.setDate(null);
-        tfTelefono.setText(null);
-        tfMail.setText(null);
-
     }//GEN-LAST:event_btnGuardarClienteActionPerformed
 
     private void pnlBtnRegistroMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlBtnRegistroMouseClicked
         tpnlPantallas.setSelectedIndex(1);
-        pnlClientes.setVisible(false);
-        for (int i = 0; i < Integer.parseInt(tfNParcelas.getText()); i++) {
-           cbParcela.addItem(String.valueOf(i+1)); 
+        estadoInicialRegistro();
+        /*pnlClientes.setVisible(false);
+        try {
+            String[] datosComboBox;
+            int numRegistros = conexion.contarFilas("SELECT COUNT(*) FROM parcelas where disponibilidad = true;");
+            datosComboBox = conexion.selectFromTabla("select num_parcela from parcelas where disponibilidad = true;",numRegistros);
+            cbParcela.removeAllItems();
+            for (int i = 0; i < (datosComboBox.length); i++) {
+            cbParcela.addItem(datosComboBox[i]); 
         }
+        } catch (SQLException ex) {
+            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+        }*/
+        
         
     }//GEN-LAST:event_pnlBtnRegistroMouseClicked
 
@@ -1047,8 +1105,36 @@ public class Interfaz extends javax.swing.JFrame {
     }//GEN-LAST:event_pnlBtnMapaMouseClicked
 
     private void pnlBtnAlertasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlBtnAlertasMouseClicked
+        DefaultTableModel dtmResultHoy = new DefaultTableModel();
+        DefaultTableModel dtmResultManiana = new DefaultTableModel();
+        DefaultTableModel dtmResultSiguientes = new DefaultTableModel();
         tpnlPantallas.setSelectedIndex(4);
         pnlNuevaAlerta.setVisible(false);
+        String [] cabecera = {"Titulo","Descripción"};
+        String [] cabecera2 = {"Titulo","Descripción","Día"};
+        Calendar calendario = Calendar.getInstance();
+        int dia = calendario.get(Calendar.DATE);
+        int mes = calendario.get(Calendar.MONTH);
+        int annio = calendario.get(Calendar.YEAR);
+        //String fechaHoySQL = annio+"-"+(mes+1)+"-"+dia;
+        String fechaHoySQL = "2023-03-02";
+        System.out.println(fechaHoySQL);
+        dtmResultHoy.setColumnIdentifiers(cabecera);
+        tblHoy.setModel(dtmResultHoy);
+        dtmResultHoy.setRowCount(0);
+        dtmResultManiana.setColumnIdentifiers(cabecera);    
+        tblManiana.setModel(dtmResultManiana);
+        dtmResultManiana.setRowCount(0);
+        dtmResultSiguientes.setColumnIdentifiers(cabecera2);
+        tblSiguientes.setModel(dtmResultSiguientes);
+        dtmResultSiguientes.setRowCount(0);
+        try {
+            conexion.selectFromTabla("SELECT titulo, descripcion FROM alertas WHERE dia_alerta LIKE "+"'"+fechaHoySQL+"';", dtmResultHoy);
+            conexion.selectFromTabla("SELECT titulo, descripcion FROM alertas WHERE dia_alerta LIKE "+"'"+fechaHoySQL+"';", dtmResultManiana);
+            conexion.selectFromTabla("SELECT titulo, descripcion, dia_alerta FROM alertas WHERE dia_alerta NOT LIKE "+"'"+fechaHoySQL+"';", dtmResultSiguientes);
+        } catch (SQLException ex) {
+            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_pnlBtnAlertasMouseClicked
 
     private void pnlBtnInfoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_pnlBtnInfoMouseClicked
@@ -1066,6 +1152,7 @@ public class Interfaz extends javax.swing.JFrame {
         tf[3]=tfPagWeb;
         tf[4]=tfNParcelas;
         tf[5]=tfprecioNoche;
+       //miArea.setNumParcelas(Integer.parseInt(tfNParcelas.getText()));
         
         try {
             conexion.selectFromTabla(selectServicio, dtmServicios);
@@ -1090,9 +1177,9 @@ public class Interfaz extends javax.swing.JFrame {
     private void btnImportarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportarActionPerformed
         //Coloca la imagen seleccionada con el metodo seleccionarImagen en una etiqueta
         //Añadir funcionalidad: si en la BD pathMapa tiene datos, meter esos datos en el label
-        String pathMapa = seleccionarImagen(); //Guardo la ruta del archivo
-        miArea.setPathMapa(pathMapa);
+        String pathMapa = seleccionarImagen(); //Guardo la ruta del archivo       
         insertarImagen (lblImagen, pathMapa);
+        miArea.setPathMapa(pathMapa);
 
     }//GEN-LAST:event_btnImportarActionPerformed
 
@@ -1129,7 +1216,6 @@ public class Interfaz extends javax.swing.JFrame {
                 conexion.UpdateBd(miArea.toSQL());
                 for (int i = 0; i < miArea.getNumParcelas(); i++) {  
                 Parcela parcela = new Parcela (i+1,true);
-                    System.out.println("parcela "+parcela);
                 conexion.UpdateBd(parcela.toSQL());
                 }
                 JOptionPane.showMessageDialog(null,"Se han actualizado los datos con éxito");
@@ -1181,7 +1267,6 @@ public class Interfaz extends javax.swing.JFrame {
             
         }
         miArea.setServicios(listaServicios);
-        listaServicios.toString();
 
     }//GEN-LAST:event_btnGuardarServiciosActionPerformed
 
@@ -1220,6 +1305,17 @@ public class Interfaz extends javax.swing.JFrame {
 
     private void btnGuardarAlertaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarAlertaActionPerformed
         alerta = new Alerta(tfTituloAlerta.getText(),taDescripcionAlerta.getText(),dcDiaAlerta.getDate());
+        try {
+            conexion.UpdateBd(alerta.toSQL());
+            JOptionPane.showMessageDialog(null,"Se ha añadido la nueva alerta");
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+            JOptionPane.showMessageDialog(null,"Ha ocurrido un error al añadir la alerta");
+        }
+        tfTituloAlerta.setText(null);
+        dcDiaAlerta.setDate(null);
+        taDescripcionAlerta.setText(null);
     }//GEN-LAST:event_btnGuardarAlertaActionPerformed
 
     
@@ -1254,7 +1350,7 @@ public class Interfaz extends javax.swing.JFrame {
         ConexionBBDD connect = new ConexionBBDD();
         try {
             connect.crearTablas();
-            System.out.println("Se ha conectado correctamente a la BD");
+            System.out.println("Se ha conectado correctamente a la BD");  
         } catch (SQLException ex) {
             System.err.println("No se ha podido conectar al servidor SQL");
             Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);

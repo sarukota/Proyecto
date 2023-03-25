@@ -213,7 +213,7 @@ public class ConexionBBDD { //Ver en Eclipse M06 Acceso a datos VT05 el ejemplo
                     datosTabla[contador] = resultado.getString(1);
                     contador++;
                 }    
-                System.out.println("los datos de la tablas son: "+Arrays.toString(datosTabla));
+                System.out.println("los datos seleccionados de la tablas son: "+Arrays.toString(datosTabla));
                 resultado.close();
                 sentencia.close();
                 connect.close();

@@ -11,7 +11,7 @@ import java.util.Arrays;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
-import jdk.internal.util.ArraysSupport;
+
 
 //Meter todos los not null y las FK
 
@@ -137,12 +137,9 @@ public class ConexionBBDD { //Ver en Eclipse M06 Acceso a datos VT05 el ejemplo
             sentencia.executeUpdate("USE furgoGestion;");
             try (ResultSet resultado = sentencia.executeQuery(consulta)) {
                 while (resultado.next()){
-                    System.out.println("filas tabla ants de cerrar: "+resultado.getString(1));
                     return Integer.parseInt(resultado.getString(1));
                 }
             }
-            sentencia.close();
-            connect.close();
         }
         return 0;
     }
@@ -181,36 +178,34 @@ public class ConexionBBDD { //Ver en Eclipse M06 Acceso a datos VT05 el ejemplo
     
     //Método para realizar consultas en las tablas de la BD y colocarlas en TextFields
     public void selectFromTabla(String select,JTextField[] tf)throws SQLException{
-        try (Connection connect = DriverManager.getConnection(BBDD,USER,PASSWORD); Statement sentencia = connect.createStatement()) {
-            sentencia.executeUpdate("USE furgoGestion;");
+        try (Connection connect = DriverManager.getConnection(BBDD,USER,PASSWORD); Statement sentencia = connect.createStatement()){ 
+        sentencia.executeUpdate("USE furgoGestion;");
             try (ResultSet resultado = sentencia.executeQuery(select)) {
                 ResultSetMetaData rsmd = resultado.getMetaData();
                 while (resultado.next()){
-                    System.out.println("Se crea resultset con los resultados");
                     Object [] vector = new Object[rsmd.getColumnCount()];
                     for (int i = 0; i < rsmd.getColumnCount(); i++) {
                         vector[i] = resultado.getString(i+1);
+                        System.out.println("llega hasta aqui");
                         tf[i].setText(vector[i].toString());
                     }
                     System.out.println(Arrays.toString(vector));
-                    }
-                resultado.close();
-                }
+                }   }       
         sentencia.close();
         connect.close();
         }
-    }  
+    }
     
     //Método que devuelve un array de string de un número de registros de una tabla
     public String[]selectFromTabla(String select, int numRegistros)throws SQLException{
         try (Connection connect = DriverManager.getConnection(BBDD,USER,PASSWORD); Statement sentencia = connect.createStatement()) {
             sentencia.executeUpdate("USE furgoGestion;");
             try (ResultSet resultado = sentencia.executeQuery(select)) {
-                ResultSetMetaData rsmd = resultado.getMetaData();
-                String[] datosTabla = new String[numRegistros];
+                //ResultSetMetaData rsmd = resultado.getMetaData();
+                String[] datosTabla = new String[numRegistros];//cambiar numRegistros por numColumnas
                 int contador=0;
                 while (resultado.next()){ //mientras haya registros en la tabla
-                    datosTabla[contador] = resultado.getString(1);
+                    datosTabla[contador] = resultado.getString(1);//Poner contador+1 en lugar de 1
                     contador++;
                 }    
                 System.out.println("los datos seleccionados de la tablas son: "+Arrays.toString(datosTabla));
@@ -230,8 +225,53 @@ public class ConexionBBDD { //Ver en Eclipse M06 Acceso a datos VT05 el ejemplo
         return fechaSQL;
     }
     
-    /*//Eliminamos el esquema si existe
+    public int Filas(String consulta) throws SQLException{  
+        int filas = 0;
+        try (Connection connect = DriverManager.getConnection(BBDD,USER,PASSWORD); Statement sentencia = connect.createStatement()) {
+            sentencia.executeUpdate("USE furgoGestion;");
+            try (ResultSet resultado = sentencia.executeQuery(consulta)) {
+                while (resultado.next()){
+                    filas++;
+                }
+            }
+        }
+        return filas;
+     
+    }
+    
+    //Metodo que devuelve un array de objetos de filas y columnas con los datos de un resultSet
+    public Object[][] arrayConsulta(String consulta) throws SQLException{
+        Object[][] results;
+        try (Connection connect = DriverManager.getConnection(BBDD,USER,PASSWORD); Statement sentencia = connect.createStatement()) {
+            sentencia.executeUpdate("USE furgoGestion;");
+            // Obtener los metadatos de la tabla para conocer el número de columnas
+            try ( // Ejecutar la consulta SQL y obtener los resultados en un objeto ResultSet
+                ResultSet resultado = sentencia.executeQuery(consulta)) {
+                // Obtener los metadatos de la tabla para conocer el número de columnas
+                ResultSetMetaData metaData = resultado.getMetaData();
+                int columnas = metaData.getColumnCount();
+                // Contar el número de filas
+                int rowCount = Filas(consulta);
+                // Crear un array de filas y columnas para almacenar los resultados
+                results = new Object[rowCount][columnas];
+                // Llenar el array de resultados
+                int i = 0;
+                while (resultado.next()) {
+                    for (int j = 0; j < columnas; j++) {
+                        results[i][j] = resultado.getObject(j + 1);
+                    }
+                    i++;
+                }   // Se cierran los recursos
+            }
+        }
+        // Se devuelve el array de resultados
+        return results;
+            
+            /*Eliminamos el esquema si existe
 		String ifExists = "DROP SCHEMA  furgoGestion;";
 		sentencia.UpdateBd(ifExists);*/
-
+    }
+    
 }
+            
+

@@ -54,6 +54,7 @@ public class FrmPasajeros extends javax.swing.JFrame {
         lblTitulo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setResizable(false);
 
         pnlClientes.setBackground(new java.awt.Color(0, 153, 204));
         pnlClientes.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -61,22 +62,37 @@ public class FrmPasajeros extends javax.swing.JFrame {
         lblDNI.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblDNI.setText("DNI/ID:");
         pnlClientes.add(lblDNI, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 100, -1, -1));
+
+        tfDNI.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
+        tfDNI.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlClientes.add(tfDNI, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 90, 140, 30));
 
         lblNacionalidad.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblNacionalidad.setText("Nacionalidad:");
         pnlClientes.add(lblNacionalidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 300, -1, -1));
+
+        tfNacionalidad.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
+        tfNacionalidad.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlClientes.add(tfNacionalidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 290, 230, 30));
 
         lblNombre.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblNombre.setText("Nombre:");
         pnlClientes.add(lblNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 150, -1, -1));
+
+        tfNombre.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
+        tfNombre.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlClientes.add(tfNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 140, 230, 30));
 
         lblApellido1.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblApellido1.setText("Apellido 1:");
         pnlClientes.add(lblApellido1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 200, -1, -1));
+
+        tfApellido1.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
+        tfApellido1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlClientes.add(tfApellido1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 190, 230, 30));
+
+        tfApellido2.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
+        tfApellido2.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlClientes.add(tfApellido2, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 240, 230, 30));
 
         lblApellido2.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
@@ -86,22 +102,31 @@ public class FrmPasajeros extends javax.swing.JFrame {
         lblFechaNac.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblFechaNac.setText("Fecha nac:");
         pnlClientes.add(lblFechaNac, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 350, -1, -1));
+
+        dcFechaNac.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlClientes.add(dcFechaNac, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 340, 230, 30));
 
         lblTelefono.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblTelefono.setText("Teléfono:");
         pnlClientes.add(lblTelefono, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 400, -1, -1));
+
+        tfTelefono.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
+        tfTelefono.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlClientes.add(tfTelefono, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 390, 230, 30));
 
         lblMail.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblMail.setText("E-Mail:");
         pnlClientes.add(lblMail, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 450, -1, -1));
+
+        tfMail.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
+        tfMail.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlClientes.add(tfMail, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 440, 230, 30));
 
         btnGuardarCliente.setBackground(new java.awt.Color(0, 0, 0));
         btnGuardarCliente.setFont(new java.awt.Font("Rockwell Nova", 1, 16)); // NOI18N
         btnGuardarCliente.setForeground(new java.awt.Color(255, 255, 255));
         btnGuardarCliente.setText("Guardar cliente");
+        btnGuardarCliente.setBorder(null);
         btnGuardarCliente.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnGuardarCliente.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -111,7 +136,7 @@ public class FrmPasajeros extends javax.swing.JFrame {
         pnlClientes.add(btnGuardarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 550, 184, 40));
 
         lblCliente.setFont(new java.awt.Font("Rockwell Nova", 1, 16)); // NOI18N
-        lblCliente.setText("Cliente 1:");
+        lblCliente.setText("Cliente:");
         pnlClientes.add(lblCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, 100, -1));
 
         lblTitulo.setFont(new java.awt.Font("Rockwell Nova", 0, 18)); // NOI18N
@@ -133,7 +158,7 @@ public class FrmPasajeros extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    //Metodo para comprobar los campos
      public boolean comprobacionDatosCliente() {
                 
         boolean datosCorrectos = true;
@@ -143,26 +168,27 @@ public class FrmPasajeros extends javax.swing.JFrame {
         tfApellido1.setBackground(Color.white);
         tfTelefono.setBackground(Color.white);
         
+        //Se comprueba si campo DNI esta vacio
         if (tfDNI.getText().isBlank()) {
             tfDNI.setBackground(Color.red);
             datosCorrectos = false;
         }
-        
+        //Se comprueba si campo nombre esta vacio
         if (tfNombre.getText().isBlank()) {
             tfNombre.setBackground(Color.red);
             datosCorrectos = false;
         }
-        
+        //Se comprueba si campo Apellido1 esta vacio
         if (tfApellido1.getText().isBlank()) {
             tfApellido1.setBackground(Color.red);
             datosCorrectos = false;
         }
-        
+        //Se comprueba si campo telefono esta vacio
         if (tfTelefono.getText().isBlank()) {
             tfTelefono.setBackground(Color.red);
             datosCorrectos = false;
         }
-        
+        //Se comprueba que en campo telefono solo se puedan introducir números
         Pattern patternInteger = Pattern.compile("\\d+");
         
         if (!patternInteger.matcher(tfTelefono.getText()).matches()) {

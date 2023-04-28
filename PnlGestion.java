@@ -298,6 +298,7 @@ public class PnlGestion extends javax.swing.JPanel{
         setBackground(new java.awt.Color(0, 153, 204));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
+        tblResult.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
         tblResult.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {},
@@ -326,12 +327,13 @@ public class PnlGestion extends javax.swing.JPanel{
         btnBuscar.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
         btnBuscar.setForeground(new java.awt.Color(255, 255, 255));
         btnBuscar.setText("Buscar");
+        btnBuscar.setBorder(null);
         btnBuscar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnBuscarActionPerformed(evt);
             }
         });
-        add(btnBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 40, -1, 30));
+        add(btnBuscar, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 40, 90, 30));
 
         cbFiltro.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
         cbFiltro.addActionListener(new java.awt.event.ActionListener() {
@@ -345,6 +347,7 @@ public class PnlGestion extends javax.swing.JPanel{
         btnBorrarFila.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
         btnBorrarFila.setForeground(new java.awt.Color(255, 255, 255));
         btnBorrarFila.setText("Eliminar fila");
+        btnBorrarFila.setBorder(null);
         btnBorrarFila.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnBorrarFilaActionPerformed(evt);
@@ -356,6 +359,7 @@ public class PnlGestion extends javax.swing.JPanel{
         btnBorrarTodo.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
         btnBorrarTodo.setForeground(new java.awt.Color(255, 255, 255));
         btnBorrarTodo.setText("Eliminar todo");
+        btnBorrarTodo.setBorder(null);
         btnBorrarTodo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnBorrarTodoActionPerformed(evt);
@@ -363,7 +367,9 @@ public class PnlGestion extends javax.swing.JPanel{
         });
         add(btnBorrarTodo, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 60, 110, 30));
 
+        jtMatricula.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
         jtMatricula.setToolTipText("");
+        jtMatricula.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         jtMatricula.setMaximumSize(new java.awt.Dimension(120, 30));
         jtMatricula.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -376,12 +382,13 @@ public class PnlGestion extends javax.swing.JPanel{
         btnAniadirPasajero.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
         btnAniadirPasajero.setForeground(new java.awt.Color(255, 255, 255));
         btnAniadirPasajero.setText("Añadir pasajero");
+        btnAniadirPasajero.setBorder(null);
         btnAniadirPasajero.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnAniadirPasajeroActionPerformed(evt);
             }
         });
-        add(btnAniadirPasajero, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 40, -1, 30));
+        add(btnAniadirPasajero, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 40, 120, 30));
     }// </editor-fold>//GEN-END:initComponents
 
     private void cbSeleccionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbSeleccionActionPerformed

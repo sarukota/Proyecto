@@ -43,9 +43,9 @@ public class Interfaz extends javax.swing.JFrame {
         pantallas.setSize(1000,700);
         ImageIcon fondo = new ImageIcon("src/main/java/imagenes/wallpaperVan2.jpg");
         lblMenu.setIcon(fondo);
+        pnlCabecera.setSize(1300,40);
         
         // Botones 
-        
         pnlBtnRegistro.setOpaque(false);
         pnlBtnGestion.setOpaque(false);
         pnlBtnMapa.setOpaque(false);
@@ -395,7 +395,10 @@ public class Interfaz extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        jPanel2 = new javax.swing.JPanel();
+        pnlCabecera = new javax.swing.JPanel();
+        lblMinimizar = new javax.swing.JLabel();
+        lblCerrar = new javax.swing.JLabel();
+        jLabel6 = new javax.swing.JLabel();
         pnlBtnFactura = new javax.swing.JPanel();
         jLabel15 = new javax.swing.JLabel();
         pnlBtnRegistro = new javax.swing.JPanel();
@@ -441,26 +444,66 @@ public class Interfaz extends javax.swing.JFrame {
         btnEliminarServ = new javax.swing.JButton();
         spNotas = new javax.swing.JScrollPane();
         jTANotas = new javax.swing.JTextArea();
+        jButton1 = new javax.swing.JButton();
         pnlPantallas = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jPanel2.setBackground(new java.awt.Color(212, 72, 168));
-        jPanel2.setToolTipText("");
+        pnlCabecera.setBackground(new java.awt.Color(212, 72, 168));
+        pnlCabecera.setToolTipText("");
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1290, Short.MAX_VALUE)
+        lblMinimizar.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
+        lblMinimizar.setForeground(new java.awt.Color(255, 255, 255));
+        lblMinimizar.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblMinimizar.setText("__");
+        lblMinimizar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lblMinimizar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblMinimizarMouseClicked(evt);
+            }
+        });
+
+        lblCerrar.setFont(new java.awt.Font("Rockwell Nova", 0, 18)); // NOI18N
+        lblCerrar.setForeground(new java.awt.Color(255, 255, 255));
+        lblCerrar.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblCerrar.setText("X");
+        lblCerrar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lblCerrar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lblCerrarMouseClicked(evt);
+            }
+        });
+
+        jLabel6.setFont(new java.awt.Font("Rockwell Nova", 1, 24)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel6.setText("FurgoGestion");
+
+        javax.swing.GroupLayout pnlCabeceraLayout = new javax.swing.GroupLayout(pnlCabecera);
+        pnlCabecera.setLayout(pnlCabeceraLayout);
+        pnlCabeceraLayout.setHorizontalGroup(
+            pnlCabeceraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlCabeceraLayout.createSequentialGroup()
+                .addContainerGap(697, Short.MAX_VALUE)
+                .addComponent(jLabel6)
+                .addGap(359, 359, 359)
+                .addComponent(lblMinimizar, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblCerrar, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 30, Short.MAX_VALUE)
+        pnlCabeceraLayout.setVerticalGroup(
+            pnlCabeceraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlCabeceraLayout.createSequentialGroup()
+                .addGroup(pnlCabeceraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel6)
+                    .addGroup(pnlCabeceraLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(lblCerrar, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(lblMinimizar, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        getContentPane().add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1290, 30));
+        getContentPane().add(pnlCabecera, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1300, 30));
 
         pnlBtnFactura.setBackground(new java.awt.Color(0, 153, 204));
         pnlBtnFactura.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
@@ -564,19 +607,31 @@ public class Interfaz extends javax.swing.JFrame {
         pnlBtnInfo.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 0, 140, 50));
 
         getContentPane().add(pnlBtnInfo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 270, 340, 50));
-        getContentPane().add(lblMenu, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -10, 340, 700));
+        getContentPane().add(lblMenu, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -10, 340, 710));
 
         pnlDatos.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         pnlDatosArea.setBackground(new java.awt.Color(0, 153, 204));
         pnlDatosArea.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        tfEmailArea.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        tfEmailArea.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlDatosArea.add(tfEmailArea, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 160, 230, -1));
+
+        tfNParcelas.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        tfNParcelas.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlDatosArea.add(tfNParcelas, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 240, 230, -1));
+
+        tfPagWeb.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        tfPagWeb.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlDatosArea.add(tfPagWeb, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 200, 230, -1));
 
         lblPrecioNoche.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
         lblPrecioNoche.setText("€/noche:");
         pnlDatosArea.add(lblPrecioNoche, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 280, -1, -1));
+
+        tfprecioNoche.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        tfprecioNoche.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlDatosArea.add(tfprecioNoche, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 280, 230, -1));
 
         lblRellena.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
@@ -603,13 +658,20 @@ public class Interfaz extends javax.swing.JFrame {
         lblPagWeb.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
         lblPagWeb.setText("Página web:");
         pnlDatosArea.add(lblPagWeb, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 200, -1, -1));
+
+        tfDireccion.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        tfDireccion.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlDatosArea.add(tfDireccion, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 80, 230, -1));
+
+        tfTelefonoArea.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        tfTelefonoArea.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlDatosArea.add(tfTelefonoArea, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 120, 230, -1));
 
         btnGuardarArea.setBackground(new java.awt.Color(0, 0, 0));
         btnGuardarArea.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
         btnGuardarArea.setForeground(new java.awt.Color(255, 255, 255));
         btnGuardarArea.setText("Guardar");
+        btnGuardarArea.setBorder(null);
         btnGuardarArea.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnGuardarArea.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -622,6 +684,7 @@ public class Interfaz extends javax.swing.JFrame {
         btnEditarDatos.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
         btnEditarDatos.setForeground(new java.awt.Color(255, 255, 255));
         btnEditarDatos.setText("Editar");
+        btnEditarDatos.setBorder(null);
         btnEditarDatos.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnEditarDatos.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -645,6 +708,7 @@ public class Interfaz extends javax.swing.JFrame {
         btnAnadir.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
         btnAnadir.setForeground(new java.awt.Color(255, 255, 255));
         btnAnadir.setText("Añadir servicio");
+        btnAnadir.setBorder(null);
         btnAnadir.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnAnadir.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -652,8 +716,12 @@ public class Interfaz extends javax.swing.JFrame {
             }
         });
         pnlServicios.add(btnAnadir, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 110, 130, 30));
+
+        tfOtroServicio.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        tfOtroServicio.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlServicios.add(tfOtroServicio, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 110, 140, 30));
 
+        tblServicios.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
         tblServicios.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {},
@@ -682,12 +750,16 @@ public class Interfaz extends javax.swing.JFrame {
             }
         });
         pnlServicios.add(cbServicios, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 80, -1, -1));
+
+        tfPrecio.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        tfPrecio.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlServicios.add(tfPrecio, new org.netbeans.lib.awtextra.AbsoluteConstraints(260, 80, 60, -1));
 
         btnGuardarServicios.setBackground(new java.awt.Color(0, 0, 0));
         btnGuardarServicios.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
         btnGuardarServicios.setForeground(new java.awt.Color(255, 255, 255));
         btnGuardarServicios.setText("Guardar");
+        btnGuardarServicios.setBorder(null);
         btnGuardarServicios.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnGuardarServicios.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -700,6 +772,7 @@ public class Interfaz extends javax.swing.JFrame {
         btnEliminarServ.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
         btnEliminarServ.setForeground(new java.awt.Color(255, 255, 255));
         btnEliminarServ.setText("Eliminar servicios");
+        btnEliminarServ.setBorder(null);
         btnEliminarServ.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnEliminarServ.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -708,14 +781,17 @@ public class Interfaz extends javax.swing.JFrame {
         });
         pnlServicios.add(btnEliminarServ, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 330, 160, 30));
 
-        pnlDatos.add(pnlServicios, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 0, 500, 390));
+        pnlDatos.add(pnlServicios, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 0, 510, 390));
 
         jTANotas.setColumns(20);
         jTANotas.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jTANotas.setRows(5);
         spNotas.setViewportView(jTANotas);
 
-        pnlDatos.add(spNotas, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 390, 950, 280));
+        pnlDatos.add(spNotas, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 390, 960, 240));
+
+        jButton1.setText("Guardar");
+        pnlDatos.add(jButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 630, 90, 40));
 
         pantallas.addTab("InfoArea", pnlDatos);
 
@@ -813,6 +889,14 @@ public class Interfaz extends javax.swing.JFrame {
         }
         
     }//GEN-LAST:event_btnGuardarAreaActionPerformed
+
+    private void lblCerrarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblCerrarMouseClicked
+        System.exit(0);
+    }//GEN-LAST:event_lblCerrarMouseClicked
+
+    private void lblMinimizarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lblMinimizarMouseClicked
+        setExtendedState(1);
+    }//GEN-LAST:event_lblMinimizarMouseClicked
     
     public static void main(String args[]) {
 
@@ -867,19 +951,22 @@ public class Interfaz extends javax.swing.JFrame {
     private javax.swing.JButton btnGuardarArea;
     private javax.swing.JButton btnGuardarServicios;
     private javax.swing.JComboBox<String> cbServicios;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel15;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JPanel jPanel2;
+    private javax.swing.JLabel jLabel6;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JTextArea jTANotas;
+    private javax.swing.JLabel lblCerrar;
     private javax.swing.JLabel lblDireccion;
     private javax.swing.JLabel lblEmail;
     private javax.swing.JLabel lblMenu;
+    private javax.swing.JLabel lblMinimizar;
     private javax.swing.JLabel lblNPArcelas;
     private javax.swing.JLabel lblPagWeb;
     private javax.swing.JLabel lblPrecioNoche;
@@ -894,6 +981,7 @@ public class Interfaz extends javax.swing.JFrame {
     private javax.swing.JPanel pnlBtnInfo;
     private javax.swing.JPanel pnlBtnMapa;
     private javax.swing.JPanel pnlBtnRegistro;
+    private javax.swing.JPanel pnlCabecera;
     private javax.swing.JPanel pnlDatos;
     private javax.swing.JPanel pnlDatosArea;
     private javax.swing.JPanel pnlPantallas;

@@ -38,7 +38,8 @@ public class PnlRegistro extends javax.swing.JPanel {
         contadorCliente = 1;
     }
     
-    public boolean comprobacionDatosCliente() {
+    //Metodo para comprobar los campos de los clientes
+     public boolean comprobacionDatosCliente() {
                 
         boolean datosCorrectos = true;
         
@@ -47,26 +48,27 @@ public class PnlRegistro extends javax.swing.JPanel {
         tfApellido1.setBackground(Color.white);
         tfTelefono.setBackground(Color.white);
         
+        //Se comprueba si campo DNI esta vacio
         if (tfDNI.getText().isBlank()) {
             tfDNI.setBackground(Color.red);
             datosCorrectos = false;
         }
-        
+        //Se comprueba si campo nombre esta vacio
         if (tfNombre.getText().isBlank()) {
             tfNombre.setBackground(Color.red);
             datosCorrectos = false;
         }
-        
+        //Se comprueba si campo Apellido1 esta vacio
         if (tfApellido1.getText().isBlank()) {
             tfApellido1.setBackground(Color.red);
             datosCorrectos = false;
         }
-        
+        //Se comprueba si campo telefono esta vacio
         if (tfTelefono.getText().isBlank()) {
             tfTelefono.setBackground(Color.red);
             datosCorrectos = false;
         }
-        
+        //Se comprueba que en campo telefono solo se puedan introducir números
         Pattern patternInteger = Pattern.compile("\\d+");
         
         if (!patternInteger.matcher(tfTelefono.getText()).matches()) {
@@ -77,6 +79,7 @@ public class PnlRegistro extends javax.swing.JPanel {
         return datosCorrectos;
     }
     
+    //Metodo para comprobar los datos de los vehiculos
     public boolean comprobacionDatosVehiculo() {
         
         boolean datosCorrectos = true;
@@ -84,12 +87,14 @@ public class PnlRegistro extends javax.swing.JPanel {
         tfMatricula.setBackground(Color.white);
         dcCheckIn.setBackground(Color.white);
         dcCheckOut.setBackground(Color.white);
-                
+        
+        //Se comprueba si campo matrícula esta vacio        
         if (tfMatricula.getText().isBlank()) {
             tfMatricula.setBackground(Color.red);
             datosCorrectos = false;
         }
         
+        //Se comprueba si campos fechas estan vacios y que el check_in sea anterior al check_out
         Date checkin = dcCheckIn.getDate();
         Date checkout = dcCheckOut.getDate();
         
@@ -240,22 +245,37 @@ public class PnlRegistro extends javax.swing.JPanel {
         lblDNI.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblDNI.setText("DNI/ID:");
         pnlClientes.add(lblDNI, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 100, -1, -1));
+
+        tfDNI.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        tfDNI.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlClientes.add(tfDNI, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 90, 140, 30));
 
         lblNacionalidad.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblNacionalidad.setText("Nacionalidad:");
         pnlClientes.add(lblNacionalidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 300, -1, -1));
+
+        tfNacionalidad.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        tfNacionalidad.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlClientes.add(tfNacionalidad, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 290, 230, 30));
 
         lblNombre.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblNombre.setText("Nombre:");
         pnlClientes.add(lblNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 150, -1, -1));
+
+        tfNombre.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        tfNombre.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlClientes.add(tfNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 140, 230, 30));
 
         lblApellido1.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblApellido1.setText("Apellido 1:");
         pnlClientes.add(lblApellido1, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 200, -1, -1));
+
+        tfApellido1.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        tfApellido1.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlClientes.add(tfApellido1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 190, 230, 30));
+
+        tfApellido2.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        tfApellido2.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlClientes.add(tfApellido2, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 240, 230, 30));
 
         lblApellido2.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
@@ -270,24 +290,31 @@ public class PnlRegistro extends javax.swing.JPanel {
         lblTelefono.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblTelefono.setText("Teléfono:");
         pnlClientes.add(lblTelefono, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 400, -1, -1));
+
+        tfTelefono.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        tfTelefono.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlClientes.add(tfTelefono, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 390, 230, 30));
 
         lblMail.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblMail.setText("E-Mail:");
         pnlClientes.add(lblMail, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 450, -1, -1));
+
+        tfMail.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        tfMail.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlClientes.add(tfMail, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 440, 230, 30));
 
         btnGuardarCliente.setBackground(new java.awt.Color(0, 0, 0));
         btnGuardarCliente.setFont(new java.awt.Font("Rockwell Nova", 1, 16)); // NOI18N
         btnGuardarCliente.setForeground(new java.awt.Color(255, 255, 255));
         btnGuardarCliente.setText("Guardar cliente");
+        btnGuardarCliente.setBorder(null);
         btnGuardarCliente.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnGuardarCliente.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnGuardarClienteActionPerformed(evt);
             }
         });
-        pnlClientes.add(btnGuardarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 550, 184, 40));
+        pnlClientes.add(btnGuardarCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 550, 200, 40));
 
         lblCliente.setFont(new java.awt.Font("Rockwell Nova", 1, 16)); // NOI18N
         lblCliente.setText("Cliente 1:");
@@ -310,12 +337,21 @@ public class PnlRegistro extends javax.swing.JPanel {
         lblMarca.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblMarca.setText("Marca:");
         pnlVehiculos.add(lblMarca, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 170, -1, -1));
+
+        tfMatricula.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        tfMatricula.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlVehiculos.add(tfMatricula, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 110, 210, 30));
+
+        tfMarca.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        tfMarca.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlVehiculos.add(tfMarca, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 160, 210, 30));
 
         lblModelo.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblModelo.setText("Modelo:");
         pnlVehiculos.add(lblModelo, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 220, -1, -1));
+
+        tfModelo.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        tfModelo.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         pnlVehiculos.add(tfModelo, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 210, 210, 30));
 
         lblCheckIn.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
@@ -351,13 +387,14 @@ public class PnlRegistro extends javax.swing.JPanel {
         btnGuardarVehiculo.setFont(new java.awt.Font("Rockwell Nova", 1, 16)); // NOI18N
         btnGuardarVehiculo.setForeground(new java.awt.Color(255, 255, 255));
         btnGuardarVehiculo.setText("Guardar vehiculo");
+        btnGuardarVehiculo.setBorder(null);
         btnGuardarVehiculo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnGuardarVehiculo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnGuardarVehiculoActionPerformed(evt);
             }
         });
-        pnlVehiculos.add(btnGuardarVehiculo, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 550, -1, 40));
+        pnlVehiculos.add(btnGuardarVehiculo, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 550, 210, 40));
 
         jLabel6.setFont(new java.awt.Font("Rockwell Nova", 0, 18)); // NOI18N
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);

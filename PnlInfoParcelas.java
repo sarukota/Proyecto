@@ -61,39 +61,46 @@ public class PnlInfoParcelas extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         tblPasajeros = new javax.swing.JTable();
 
-        setBackground(new java.awt.Color(255, 255, 255));
+        setBackground(new java.awt.Color(0, 0, 0));
 
         tfMatricula.setEditable(false);
-        tfMatricula.setBackground(new java.awt.Color(255, 255, 255));
+        tfMatricula.setBackground(new java.awt.Color(0, 0, 0));
         tfMatricula.setFont(new java.awt.Font("Rockwell Nova", 1, 15)); // NOI18N
+        tfMatricula.setForeground(new java.awt.Color(255, 255, 255));
         tfMatricula.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         tfMatricula.setBorder(null);
 
         tfModelo.setEditable(false);
-        tfModelo.setBackground(new java.awt.Color(255, 255, 255));
+        tfModelo.setBackground(new java.awt.Color(0, 0, 0));
         tfModelo.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
+        tfModelo.setForeground(new java.awt.Color(255, 255, 255));
         tfModelo.setHorizontalAlignment(javax.swing.JTextField.LEFT);
         tfModelo.setBorder(null);
 
         tfMarca.setEditable(false);
-        tfMarca.setBackground(new java.awt.Color(255, 255, 255));
+        tfMarca.setBackground(new java.awt.Color(0, 0, 0));
         tfMarca.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
+        tfMarca.setForeground(new java.awt.Color(255, 255, 255));
         tfMarca.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         tfMarca.setBorder(null);
 
         tfCheckIn.setEditable(false);
-        tfCheckIn.setBackground(new java.awt.Color(255, 255, 255));
+        tfCheckIn.setBackground(new java.awt.Color(0, 0, 0));
         tfCheckIn.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
+        tfCheckIn.setForeground(new java.awt.Color(255, 255, 255));
         tfCheckIn.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         tfCheckIn.setBorder(null);
 
         tfCheckOut.setEditable(false);
-        tfCheckOut.setBackground(new java.awt.Color(255, 255, 255));
+        tfCheckOut.setBackground(new java.awt.Color(0, 0, 0));
         tfCheckOut.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
+        tfCheckOut.setForeground(new java.awt.Color(255, 255, 255));
         tfCheckOut.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         tfCheckOut.setBorder(null);
 
+        jLabel1.setBackground(new java.awt.Color(0, 0, 0));
         jLabel1.setFont(new java.awt.Font("Rockwell Nova", 1, 14)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(255, 255, 255));
         jLabel1.setText("Pasajeros");
 
         tblPasajeros.setModel(new javax.swing.table.DefaultTableModel(

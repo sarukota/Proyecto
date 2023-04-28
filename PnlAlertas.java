@@ -176,14 +176,15 @@ public class PnlAlertas extends javax.swing.JPanel {
         jPanel2.setBackground(new java.awt.Color(0, 153, 204));
         jPanel2.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
-        jLabel9.setFont(new java.awt.Font("Rockwell Nova", 1, 12)); // NOI18N
+        jLabel9.setFont(new java.awt.Font("Rockwell Nova", 1, 14)); // NOI18N
         jLabel9.setText("Hoy:");
         jPanel2.add(jLabel9, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 43, 51, -1));
 
-        jLabel12.setFont(new java.awt.Font("Rockwell Nova", 1, 12)); // NOI18N
+        jLabel12.setFont(new java.awt.Font("Rockwell Nova", 1, 14)); // NOI18N
         jLabel12.setText("Próximas:");
         jPanel2.add(jLabel12, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 470, 86, -1));
 
+        tblHoy.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
         tblHoy.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {},
@@ -199,10 +200,11 @@ public class PnlAlertas extends javax.swing.JPanel {
 
         jPanel2.add(jScrollPane8, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 72, 477, 180));
 
-        jLabel13.setFont(new java.awt.Font("Rockwell Nova", 1, 12)); // NOI18N
+        jLabel13.setFont(new java.awt.Font("Rockwell Nova", 1, 14)); // NOI18N
         jLabel13.setText("Mañana:");
         jPanel2.add(jLabel13, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 270, 77, -1));
 
+        tblManiana.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
         tblManiana.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {},
@@ -218,6 +220,7 @@ public class PnlAlertas extends javax.swing.JPanel {
 
         jPanel2.add(jScrollPane7, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 300, 477, 157));
 
+        tblSiguientes.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
         tblSiguientes.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {},
@@ -242,6 +245,7 @@ public class PnlAlertas extends javax.swing.JPanel {
         btnNuevaAlerta.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
         btnNuevaAlerta.setForeground(new java.awt.Color(255, 255, 255));
         btnNuevaAlerta.setText("Nueva alerta");
+        btnNuevaAlerta.setBorder(null);
         btnNuevaAlerta.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnNuevaAlerta.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -254,10 +258,15 @@ public class PnlAlertas extends javax.swing.JPanel {
 
         pnlNuevaAlerta.setBackground(new java.awt.Color(0, 153, 204));
         pnlNuevaAlerta.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-        pnlNuevaAlerta.add(tfTituloAlerta, new org.netbeans.lib.awtextra.AbsoluteConstraints(26, 41, 250, -1));
+
+        tfTituloAlerta.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        tfTituloAlerta.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
+        pnlNuevaAlerta.add(tfTituloAlerta, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 36, 250, 30));
 
         taDescripcionAlerta.setColumns(20);
+        taDescripcionAlerta.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         taDescripcionAlerta.setRows(5);
+        taDescripcionAlerta.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.LOWERED));
         jScrollPane5.setViewportView(taDescripcionAlerta);
 
         pnlNuevaAlerta.add(jScrollPane5, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 210, 250, 144));
@@ -278,6 +287,7 @@ public class PnlAlertas extends javax.swing.JPanel {
         btnGuardar.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
         btnGuardar.setForeground(new java.awt.Color(255, 255, 255));
         btnGuardar.setText("Guardar");
+        btnGuardar.setBorder(null);
         btnGuardar.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnGuardar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -285,12 +295,13 @@ public class PnlAlertas extends javax.swing.JPanel {
             }
         });
         pnlNuevaAlerta.add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 400, 96, 30));
-        pnlNuevaAlerta.add(dcDiaAlerta, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 110, 240, -1));
+        pnlNuevaAlerta.add(dcDiaAlerta, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 110, 240, 30));
 
         jButton1.setBackground(new java.awt.Color(255, 0, 51));
         jButton1.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
         jButton1.setForeground(new java.awt.Color(255, 255, 255));
         jButton1.setText("Eliminar alerta");
+        jButton1.setBorder(null);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jButton1ActionPerformed(evt);

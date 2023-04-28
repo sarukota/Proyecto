@@ -143,6 +143,7 @@ public class PnlPlano extends javax.swing.JPanel {
         btnImportar.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
         btnImportar.setForeground(new java.awt.Color(255, 255, 255));
         btnImportar.setText("Importar mapa");
+        btnImportar.setBorder(null);
         btnImportar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnImportarActionPerformed(evt);

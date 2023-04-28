@@ -6,11 +6,13 @@ package pantallasSwing;
 
 import clasesJava.ConexionBBDD;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+
+/*Panel que se llama desde la pestaña Mapa al seleccionar una parcela que está ocupada. Muestra los datos del vehiculo
+y los ocupantes que ocupan la parcela en cuestión */
 
 public class PnlInfoParcelas extends javax.swing.JPanel {
     
@@ -19,7 +21,7 @@ public class PnlInfoParcelas extends javax.swing.JPanel {
     public PnlInfoParcelas(int numParcela) {
         initComponents();
         setSize(350,450); //Da el tamaño a la ventana
-        setLocation(200,0);
+        setLocation(0,0);
         try {
             datosPanel(numParcela);
         } catch (SQLException ex) {
@@ -35,20 +37,7 @@ public class PnlInfoParcelas extends javax.swing.JPanel {
         String [] cabecera = {"DNI","Nombre","Apellido"};
         DefaultTableModel dtmResult = new DefaultTableModel();
         dtmResult = SetCabeceras(cabecera);
-        conexion.selectFromTabla("SELECT dni,nombre,apellido1 FROM clientes WHERE matricula = '"+tfMatricula.getText()+"';",dtmResult);
-        
-     /*   
-        Object[][] consultaClientes = conexion.arrayConsulta("SELECT dni FROM clientes WHERE matricula = '"+tfMatricula.getText()+"';");
-        JTextField tf = new JTextField();
-        for (int i = 0; i < consultaClientes.length; i++) {
-            for (int j = 0; j < consultaClientes[i].length; j++) {
-                tf.setText(consultaClientes[i][j].toString());
-                pnlPasajeros.add(tf);
-                pnlPasajeros.revalidate();
-                pnlPasajeros.repaint();
-            }
-        }*/
-        
+        conexion.selectFromTabla("SELECT dni,nombre,apellido1 FROM clientes WHERE matricula = '"+tfMatricula.getText()+"';",dtmResult); 
     }
     
     public DefaultTableModel SetCabeceras (String[] cabecera){
@@ -58,36 +47,6 @@ public class PnlInfoParcelas extends javax.swing.JPanel {
         dtmResult.setRowCount(0);
         return dtmResult;
     }
-    /*
-    public void datosPanel2(int numParcela){
-        JTextField[] tfVehiculo = {tfMatricula,tfMarca,tfModelo,tfCheckIn,tfCheckOut};
-        JTextField[][] tfClientes;
-        System.out.println("numero parcela desde panel parcelas = "+numParcela);
-        try {
-            conexion.selectFromTabla("SELECT matricula, marca, modelo, check_in, check_out FROM vehiculos WHERE num_parcela = '"+numParcela+"';",tfVehiculo);
-            String cuentaClientes = Arrays.toString(conexion.selectFromTabla("SELECT COUNT(*) FROM clientes WHERE matricula = '"+tfMatricula.getText()+"';",1));
-            char caracter1 = cuentaClientes.charAt(1);
-            System.out.println("CuentaClientes : "+Character.getNumericValue(caracter1));
-            tfClientes = new JTextField [Character.getNumericValue(caracter1)];
-            //ERROR: el select devuelve datos de diferentes filas: solucion modificar select para que me devuelva los datos correctos y asi ahorrar codigo
-            Object[][] consultaClientes = conexion.arrayConsulta("SELECT dni FROM clientes WHERE matricula = '"+tfMatricula.getText()+"';");
-            //String[][] objAString = new String[consultaClientes.length][consultaClientes[0].length];
-            for (int i = 0; i < consultaClientes.length; i++) {
-                for (int j = 0; j < consultaClientes[i].length; j++) {
-                    tfClientes[i].setText(consultaClientes[i][j].toString());
-                }
-            }
-            for (int i = 0; i < tfClientes.length; i++) {
-                pnlPasajeros.add(tfClientes[i]);
-            }
-            pnlPasajeros.revalidate();
-            pnlPasajeros.repaint();
-
-        } catch (SQLException ex) {
-            Logger.getLogger(PnlInfoParcelas.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-    }*/
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -109,22 +68,17 @@ public class PnlInfoParcelas extends javax.swing.JPanel {
         tfMatricula.setFont(new java.awt.Font("Rockwell Nova", 1, 15)); // NOI18N
         tfMatricula.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         tfMatricula.setBorder(null);
-        tfMatricula.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfMatriculaActionPerformed(evt);
-            }
-        });
 
         tfModelo.setEditable(false);
         tfModelo.setBackground(new java.awt.Color(255, 255, 255));
         tfModelo.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
-        tfModelo.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        tfModelo.setHorizontalAlignment(javax.swing.JTextField.LEFT);
         tfModelo.setBorder(null);
 
         tfMarca.setEditable(false);
         tfMarca.setBackground(new java.awt.Color(255, 255, 255));
         tfMarca.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
-        tfMarca.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        tfMarca.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
         tfMarca.setBorder(null);
 
         tfCheckIn.setEditable(false);
@@ -138,11 +92,6 @@ public class PnlInfoParcelas extends javax.swing.JPanel {
         tfCheckOut.setFont(new java.awt.Font("Rockwell Nova", 0, 14)); // NOI18N
         tfCheckOut.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         tfCheckOut.setBorder(null);
-        tfCheckOut.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfCheckOutActionPerformed(evt);
-            }
-        });
 
         jLabel1.setFont(new java.awt.Font("Rockwell Nova", 1, 14)); // NOI18N
         jLabel1.setText("Pasajeros");
@@ -206,14 +155,6 @@ public class PnlInfoParcelas extends javax.swing.JPanel {
                 .addContainerGap(66, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
-
-    private void tfMatriculaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfMatriculaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tfMatriculaActionPerformed
-
-    private void tfCheckOutActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfCheckOutActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tfCheckOutActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

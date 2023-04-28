@@ -10,6 +10,7 @@ import java.util.Arrays;
 
 public class Area {
     //Variables coincidentes con la BBDD
+    private int id;
     private String direccion;
     private int telefono;
     private String mail;
@@ -18,9 +19,9 @@ public class Area {
     private int precioNoche;
     private String pathMapa;
     private File informacion; //convertir a String con el path del fichero
+    
     //Variables solo de la clase para ser usadas por el programa
-    private ArrayList<Servicio> Servicios = new ArrayList<>(); //Convertir a Array
-    private Parcela [] parcelas;
+   // private ArrayList<Servicio> Servicios = new ArrayList<>(); //Convertir a Array
 
     public Area(){
         
@@ -35,6 +36,14 @@ public class Area {
         this.precioNoche = precioNoche;
         this.pathMapa = mapa;
         this.informacion = informacion;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getDireccion() {
@@ -84,15 +93,7 @@ public class Area {
     public void setPrecioNoche(int precioNoche) {
         this.precioNoche = precioNoche;
     }
-
-    public ArrayList<Servicio> getServicios() {
-        return Servicios;
-    }
-
-    public void setServicios(ArrayList<Servicio> Servicios) {
-        this.Servicios = Servicios;
-    }
-
+    
     public String getPathMapa() {
         return pathMapa;
     }
@@ -126,13 +127,9 @@ public class Area {
 
     @Override
     public String toString() {
-        return "Area{" + "direccion=" + direccion + ", telefono=" + telefono + ", mail=" + mail + ", web=" + web + ", numParcelas=" + numParcelas + ", precioNoche=" + precioNoche + ", Servicios=" + Servicios + ", mapa=" + pathMapa + ", informacion=" + informacion + '}';
+        return "Area{" + "direccion=" + direccion + ", telefono=" + telefono + ", mail=" + mail + ", web=" + web + ", numParcelas=" + numParcelas + ", precioNoche=" + precioNoche + ", pathMapa=" + pathMapa + ", informacion=" + informacion + '}';
     }
 
-    
-    
-    
-    
     
 }
 

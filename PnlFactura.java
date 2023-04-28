@@ -6,9 +6,11 @@ package pantallasSwing;
 
 import clasesJava.ConexionBBDD;
 import clasesJava.Interfaz;
+import clasesJava.Servicio;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.logging.Level;
@@ -16,21 +18,23 @@ import java.util.logging.Logger;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
+/*Sin terminar aun. Este panel generará la factura de un vehiculo seleccionado 
+añadiendo los servicios que este ha utilizado y calculando los días de estancia*/
+
 public class PnlFactura extends javax.swing.JPanel {
     
     ConexionBBDD conexion = new ConexionBBDD();
+    ArrayList<Servicio> listaServicios = new ArrayList<>();
+    DefaultTableModel dtm = new DefaultTableModel();
+    int sumaServicios = 0;
 
     public PnlFactura() {
         initComponents();
-        setSize(1300,700); //Da el tamaño a la ventana
-        setLocation(0,0);
-        
         Calendar calendario = Calendar.getInstance();
         Date fechaHoy = calendario.getTime();
         try {
             String[] datosCBMatriculas;
-            int numRegistros = conexion.contarFilas("SELECT COUNT(*) FROM vehiculos;");
-            datosCBMatriculas = conexion.selectFromTabla("select matricula from vehiculos where check_out >= '"+conexion.fechaSQL(fechaHoy)+"';",numRegistros);
+            datosCBMatriculas = conexion.selectFromTabla("SELECT matricula FROM vehiculos WHERE check_out >= '"+conexion.fechaSQL(fechaHoy)+"';");
             JcbMatriculas.removeAllItems();
             for (int i = 0; i < (datosCBMatriculas.length); i++) {
                 JcbMatriculas.addItem(datosCBMatriculas[i]);   
@@ -41,8 +45,6 @@ public class PnlFactura extends javax.swing.JPanel {
                 aniadirDatos();
             }
         });
-            
- 
         } catch (SQLException ex) {
             Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -53,10 +55,9 @@ public class PnlFactura extends javax.swing.JPanel {
             JTextField[]fechas = new JTextField[2];
             fechas[0]=JtfDe;
             fechas[1]=JtfA;
-            conexion.selectFromTabla("SELECT check_in, check_out from vehiculos WHERE matricula = '"+JcbMatriculas.getSelectedItem().toString()+"';",fechas);
+            conexion.selectFromTabla("SELECT check_in, check_out FROM vehiculos WHERE matricula = '"+JcbMatriculas.getSelectedItem().toString()+"';",fechas);
             String[] datosCBServicios;
-            int registrosServicios = conexion.contarFilas("SELECT COUNT(*) FROM servicios;");
-            datosCBServicios = conexion.selectFromTabla("select nombre from servicios;",registrosServicios);
+            datosCBServicios = conexion.selectFromTabla("SELECT nombre FROM servicios;");
             jCBServContratados.removeAllItems();
             for (int i = 0; i < (datosCBServicios.length); i++) {
                 jCBServContratados.addItem(datosCBServicios[i]); 
@@ -65,6 +66,14 @@ public class PnlFactura extends javax.swing.JPanel {
             Logger.getLogger(PnlFactura.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    public int precioEstancia () throws SQLException{
+        int precioNoche = Integer.parseInt(conexion.selectDato("SELECT precio_noche FROM area"));
+        int numeroNoches = Integer.parseInt(tfNumNoches.getText());
+        int precioEstancia = precioNoche*numeroNoches;
+        return precioEstancia;
+    }
+    
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -90,9 +99,10 @@ public class PnlFactura extends javax.swing.JPanel {
         jLabel24 = new javax.swing.JLabel();
         jRadioButton1 = new javax.swing.JRadioButton();
         jRadioButton2 = new javax.swing.JRadioButton();
-        jLabel25 = new javax.swing.JLabel();
         JtfA = new javax.swing.JTextField();
         JtfDe = new javax.swing.JTextField();
+        lblTotal = new javax.swing.JLabel();
+        tfNumNoches = new javax.swing.JTextField();
 
         setBackground(new java.awt.Color(0, 153, 204));
 
@@ -166,35 +176,26 @@ public class PnlFactura extends javax.swing.JPanel {
         });
         jPanel3.add(jBtnAniadir, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 160, 99, 30));
 
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
-            }
-        });
-        jPanel3.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(135, 359, -1, -1));
+        jTextField1.setMaximumSize(new java.awt.Dimension(64, 22));
+        jPanel3.add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(135, 359, 60, -1));
 
         jLabel23.setText("Descuento:");
         jPanel3.add(jLabel23, new org.netbeans.lib.awtextra.AbsoluteConstraints(49, 362, -1, -1));
 
-        jLabel24.setText("Total sin IVA:");
-        jPanel3.add(jLabel24, new org.netbeans.lib.awtextra.AbsoluteConstraints(49, 399, 126, -1));
+        jLabel24.setText("Total a pagar:");
+        jPanel3.add(jLabel24, new org.netbeans.lib.awtextra.AbsoluteConstraints(49, 399, 80, -1));
 
         jRadioButton1.setText("€");
         jPanel3.add(jRadioButton1, new org.netbeans.lib.awtextra.AbsoluteConstraints(217, 360, -1, -1));
 
         jRadioButton2.setText("%");
         jPanel3.add(jRadioButton2, new org.netbeans.lib.awtextra.AbsoluteConstraints(264, 360, -1, -1));
-
-        jLabel25.setText("Total con IVA:");
-        jPanel3.add(jLabel25, new org.netbeans.lib.awtextra.AbsoluteConstraints(275, 399, 126, -1));
         jPanel3.add(JtfA, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 30, 150, 30));
-
-        JtfDe.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                JtfDeActionPerformed(evt);
-            }
-        });
         jPanel3.add(JtfDe, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 30, 140, 29));
+        jPanel3.add(lblTotal, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 396, 70, 20));
+
+        tfNumNoches.setText("1");
+        jPanel3.add(tfNumNoches, new org.netbeans.lib.awtextra.AbsoluteConstraints(130, 72, 80, 30));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -236,30 +237,30 @@ public class PnlFactura extends javax.swing.JPanel {
     }//GEN-LAST:event_jBtnMenosActionPerformed
 
     private void jBtnAniadirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jBtnAniadirActionPerformed
-        DefaultTableModel dtm = new DefaultTableModel();
+        String [] cabecera = {"Servicio","Precio","Nº usos" };
+        dtm.setColumnIdentifiers(cabecera);
         Object [] datos = new Object[3];
-        String [] datosServ = new String[2];
+        int precio = 0;
         try {
-            datosServ = conexion.selectFromTabla("SELECT precio FROM servicios where nombre = '"+jCBServContratados.getSelectedItem().toString()+"';",1);
-            System.out.println("se ha hecho el select y obtenido "+datosServ[1]);
+            precio = Integer.parseInt(conexion.selectDato("SELECT precio FROM servicios where nombre = '"+jCBServContratados.getSelectedItem().toString()+"';"));    
         } catch (SQLException ex) {
             Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
         }
         datos[0] = jCBServContratados.getSelectedItem();
-        datos[1] = datosServ[1];
+        datos[1] = precio;
         datos[2] = JlblContadorServ.getText();
         dtm.addRow(datos);
         JTblServContratados.setModel(dtm);
-
+        int precioServicios = Integer.parseInt(datos[1].toString())*Integer.parseInt(datos[2].toString());
+        sumaServicios = (sumaServicios + precioServicios);
+        int total = 0;
+        try {
+            total = sumaServicios + precioEstancia();
+        } catch (SQLException ex) {
+            Logger.getLogger(PnlFactura.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        lblTotal.setText(total+" €");
     }//GEN-LAST:event_jBtnAniadirActionPerformed
-
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
-
-    private void JtfDeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_JtfDeActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_JtfDeActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -280,11 +281,12 @@ public class PnlFactura extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel22;
     private javax.swing.JLabel jLabel23;
     private javax.swing.JLabel jLabel24;
-    private javax.swing.JLabel jLabel25;
     private javax.swing.JPanel jPanel3;
     private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JRadioButton jRadioButton2;
     private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JTextField jTextField1;
+    private javax.swing.JLabel lblTotal;
+    private javax.swing.JTextField tfNumNoches;
     // End of variables declaration//GEN-END:variables
 }

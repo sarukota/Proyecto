@@ -5,12 +5,11 @@
 package pantallasSwing;
 
 import clasesJava.ConexionBBDD;
-import clasesJava.Servicio;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.ImageIcon;
@@ -19,14 +18,29 @@ import javax.swing.JFileChooser;
 import javax.swing.JLabel;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+/*Este panel nos muestra todas las parcelas de las que dispone el áre y su disponibilidad. También nos permite cargar una
+imagen de nuestro equipo que representará el mapa de nuestro área. Fallo a la hora de representar los botones 
+cuando hay más de 15 parcelas aprox. Fallo a la hora de cargar la imagen de la base de datos una vez ha sido guardada*/
+
 public class PnlPlano extends javax.swing.JPanel {
     
     ConexionBBDD conexion = new ConexionBBDD(); 
  
     public PnlPlano() {
         initComponents();
-        setSize(1300,700); //Da el tamaño a la ventana
-        setLocation(0,0);
+        pnlBase.setSize(360,450);
+        
+        try {
+            String rutaMapa = conexion.selectDato("SELECT ruta_mapa FROM area");
+            System.out.println(rutaMapa);
+            if (rutaMapa != null){
+                System.out.println("entro en if");
+                insertarImagen (lblImagen, rutaMapa); //no funciona pero la ruta que coge es la misma que cuando la inserto a través de filechooser
+            }
+        } catch (SQLException ex) {
+            Logger.getLogger(PnlPlano.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
         try {
             listaBotones();
         } catch (SQLException ex) {
@@ -40,7 +54,16 @@ public class PnlPlano extends javax.swing.JPanel {
         FileNameExtensionFilter filter = new FileNameExtensionFilter("JPG, GIF & PNG Images", "jpg", "gif", "png");
         chooser.setFileFilter(filter); //Pongo un filtro para la extensión de los archivos
         int returnVal = chooser.showOpenDialog(null); //Se abre la ventana de FileChooser
-        if(returnVal == JFileChooser.APPROVE_OPTION) { //Si se presiona el botón aceptar
+        if(returnVal == JFileChooser.APPROVE_OPTION) { try {
+            //Si se presiona el botón aceptar se guarda en BD la ruta del mapa con el formato correcto
+            String ruta = chooser.getSelectedFile().getPath();
+            String rutaModificada = ruta.replace("\\", "\\\\");
+            System.out.println(rutaModificada);
+            String direccionArea = conexion.selectDato("SELECT direccion FROM area");
+            conexion.updateBd("UPDATE area SET ruta_mapa ='"+rutaModificada+"' WHERE direccion = '"+direccionArea+"';");
+            } catch (SQLException ex) {
+                Logger.getLogger(PnlPlano.class.getName()).log(Level.SEVERE, null, ex);
+            }
            System.out.println("You chose to open this file: " + chooser.getSelectedFile().getPath());
         }
         return chooser.getSelectedFile().getPath();
@@ -49,6 +72,8 @@ public class PnlPlano extends javax.swing.JPanel {
     //Metodo para insertar una imagen en un Jlabel
     public void insertarImagen (JLabel labelFondo, String ruta){ 
         ImageIcon imagen = new ImageIcon(ruta); //obtengo una imagen de la ruta específica
+        System.out.println("ruta en insertar imagen "+ruta);
+        labelFondo.setSize(600, 510);
         ImageIcon imagenEscala = new ImageIcon(imagen.getImage().getScaledInstance(labelFondo.getWidth(), labelFondo.getHeight(), Image.SCALE_DEFAULT)); //para ajustar imagen al tamaño del label
         if (imagenEscala.getImageLoadStatus() == java.awt.MediaTracker.COMPLETE) {
             labelFondo.setText("");
@@ -56,52 +81,50 @@ public class PnlPlano extends javax.swing.JPanel {
         }else{
             System.err.println("Ha ocurrido un error");
         }
-    }
+    } 
     
-    public void listaBotones() throws SQLException{
-        System.out.println("entro en lista botones");
-        String parcelasArea = Arrays.toString(conexion.selectFromTabla("SELECT num_parcelas FROM area",1));
-        char caracter1 = parcelasArea.charAt(1);
-        char caracter2 = parcelasArea.charAt(2);
-        System.out.println("caracteres sumados: "+Character.getNumericValue(caracter1+caracter2));
-        
-        for (int i = 0; i < (Character.getNumericValue(caracter1+caracter2)); i++) {
+    /*Método que genera los botones que van a representar las parcelas, se generan tantos botones 
+    como parcelas hayamos indicado en la información del Area*/
+    public void listaBotones() throws SQLException{ 
+        int numParcelas = Integer.parseInt(conexion.selectDato("SELECT num_parcelas FROM area"));
+        pnlBotones.setLayout(new GridLayout(0, numParcelas));
+        pnlBotones.removeAll();
+        for (int i = 0; i < numParcelas; i++) {
             JButton btnParcela = new JButton(String.valueOf(i+1));
             PnlInfoParcelas PIP = new PnlInfoParcelas(i+1);
             btnParcela.setSize(40, 40);
-
             //se modifica el color de los botones según la disponibilidad de la parcela
-            String disponible = Arrays.toString(conexion.selectFromTabla("SELECT disponibilidad FROM parcelas WHERE num_parcela = "+(i+1)+";",1));
-            System.out.println("disponibilidad: "+disponible);
-            char disponibleChar = disponible.charAt(1);
-            if (Character.getNumericValue(disponibleChar)!= 1){
+            int disponible = Integer.parseInt(conexion.selectDato("SELECT disponibilidad FROM parcelas WHERE num_parcela = "+(i+1)+";")) ;
+            if (disponible != 1){
                 btnParcela.setBackground(Color.black);
                 btnParcela.setForeground(Color.white);
-            }
+                //Se añade mouse listener sobre el boton para que salte el pnlInfoParcelas al pasar raton por encima
+                btnParcela.addMouseListener(new java.awt.event.MouseAdapter() {
+                    @Override
+                    public void mouseEntered(java.awt.event.MouseEvent evt) {
+                        pnlBase.add(PIP,BorderLayout.CENTER);
+                        pnlBase.revalidate();
+                        pnlBase.repaint();
+                    } 
+                });
+                btnParcela.addMouseListener(new java.awt.event.MouseAdapter() {
+                    @Override
+                    public void mouseExited(java.awt.event.MouseEvent evt) {
+                        pnlBase.remove(PIP);
+                        pnlBase.revalidate();
+                        pnlBase.repaint();
+                    } 
+                });
+                }
             else {
                 btnParcela.setBackground(Color.white);
                 btnParcela.setForeground(Color.black);
             } 
-            //Se añade mouse listener sobre el boton para que salte el panel de datos al pasar raton por encima
-            btnParcela.addMouseListener(new java.awt.event.MouseAdapter() {
-                @Override
-                public void mouseEntered(java.awt.event.MouseEvent evt) {
-                    lblImagen.add(PIP,BorderLayout.CENTER);
-                    lblImagen.revalidate();
-                    lblImagen.repaint();
-                } 
-            });
-            btnParcela.addMouseListener(new java.awt.event.MouseAdapter() {
-                @Override
-                public void mouseExited(java.awt.event.MouseEvent evt) {
-                    lblImagen.remove(PIP);
-                    lblImagen.revalidate();
-                    lblImagen.repaint();
-                } 
-            });
+            
             pnlBotones.add(btnParcela);
         }
     }
+    
 
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -111,6 +134,7 @@ public class PnlPlano extends javax.swing.JPanel {
         lblImagen = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         pnlBotones = new javax.swing.JPanel();
+        pnlBase = new javax.swing.JPanel();
 
         setBackground(new java.awt.Color(0, 153, 204));
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -124,14 +148,22 @@ public class PnlPlano extends javax.swing.JPanel {
                 btnImportarActionPerformed(evt);
             }
         });
-        add(btnImportar, new org.netbeans.lib.awtextra.AbsoluteConstraints(28, 23, 134, 42));
-        add(lblImagen, new org.netbeans.lib.awtextra.AbsoluteConstraints(28, 83, 710, 400));
+        add(btnImportar, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, 134, 42));
+
+        lblImagen.setMinimumSize(new java.awt.Dimension(600, 510));
+        lblImagen.setPreferredSize(new java.awt.Dimension(600, 510));
+        add(lblImagen, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 80, 600, 510));
 
         pnlBotones.setBackground(new java.awt.Color(0, 153, 204));
+        pnlBotones.setAutoscrolls(true);
         pnlBotones.setLayout(new java.awt.GridLayout(1, 0, 5, 0));
         jScrollPane1.setViewportView(pnlBotones);
 
-        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 490, 850, 120));
+        add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 10, 750, 60));
+
+        pnlBase.setBackground(new java.awt.Color(0, 153, 204));
+        pnlBase.setPreferredSize(new java.awt.Dimension(350, 450));
+        add(pnlBase, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 160, 290, 430));
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnImportarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnImportarActionPerformed
@@ -139,7 +171,7 @@ public class PnlPlano extends javax.swing.JPanel {
         //Añadir funcionalidad: si en la BD pathMapa tiene datos, meter esos datos en el label
         String pathMapa = seleccionarImagen(); //Guardo la ruta del archivo
         insertarImagen (lblImagen, pathMapa);
-        //miArea.setPathMapa(pathMapa);
+        
     }//GEN-LAST:event_btnImportarActionPerformed
 
 
@@ -147,6 +179,7 @@ public class PnlPlano extends javax.swing.JPanel {
     private javax.swing.JButton btnImportar;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblImagen;
+    private javax.swing.JPanel pnlBase;
     private javax.swing.JPanel pnlBotones;
     // End of variables declaration//GEN-END:variables
 }

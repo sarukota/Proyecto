@@ -18,13 +18,12 @@ public class Vehiculo {
     private int numParcela;
     private Date checkIn;
     private Date checkOut;
-    private String tituloAlerta;
  	
     public Vehiculo() {
 		
     }
 
-    public Vehiculo(String matricula, String marca, String modelo, int numOcupantes, int numParcela, Date checkIn, Date checkOut, String tituloAlerta) {
+    public Vehiculo(String matricula, String marca, String modelo, int numOcupantes, int numParcela, Date checkIn, Date checkOut) {
         this.matricula = matricula;
         this.marca = marca;
         this.modelo = modelo;
@@ -32,7 +31,6 @@ public class Vehiculo {
         this.numParcela = numParcela;
         this.checkIn = checkIn;
         this.checkOut = checkOut;
-        this.tituloAlerta = tituloAlerta;
     }
 
     public String getMatricula() {
@@ -90,41 +88,18 @@ public class Vehiculo {
     public void setCheckOut(Date checkOut) {
         this.checkOut = checkOut;
     }
-
-    public String getTituloAlerta() {
-        return tituloAlerta;
-    }
-
-    public void setTituloAlerta(String tituloAlerta) {
-        this.tituloAlerta = tituloAlerta;
-    }
-
-    private void calculoFactura(Area miArea){
-        DateFormat fechaCorta = new SimpleDateFormat ("dd-MM-aaaa");
-        Date fechaEmision = new Date(System.currentTimeMillis());
-        String factura = fechaCorta.format(fechaEmision) +"\n"
-                + "Entrada: "+fechaCorta.format(getCheckIn())+"      Salida: "+fechaCorta.format(getCheckOut())+"\n"
-                + "Vehículo: "+getMatricula()+"\n";
-               //+ "Servicios: "+Arrays.toString(miArea.getServicios())+"";
-        JOptionPane.showMessageDialog(null, factura);
-    } 
     
     public String toSQL(){
         ConexionBBDD conexion = new ConexionBBDD();
-        String insertVehiculo = "INSERT INTO vehiculos (matricula, marca, modelo, num_ocupantes, num_parcela, check_in, check_out, titulo_alerta)"
+        String insertVehiculo = "INSERT INTO vehiculos (matricula, marca, modelo, num_ocupantes, num_parcela, check_in, check_out)"
                 + "VALUES ('"+getMatricula()+"','"+getMarca()+"','"+getModelo()+"',"+getNumOcupantes()+","
-                + getNumParcela()+",'"+conexion.fechaSQL(getCheckIn())+"','"+conexion.fechaSQL(getCheckOut())+"','"+getTituloAlerta()+"');";
+                + getNumParcela()+",'"+conexion.fechaSQL(getCheckIn())+"','"+conexion.fechaSQL(getCheckOut())+"');";
         return insertVehiculo;
     }
 
     @Override
     public String toString() {
-        return "Vehiculo{" + "matricula=" + matricula + ", marca=" + marca + ", modelo=" + modelo + ", numOcupantes=" + numOcupantes + ", numParcela=" + numParcela + ", checkIn=" + checkIn + ", checkOut=" + checkOut + ", tituloAlerta=" + tituloAlerta + '}';
+        return "Vehiculo{" + "matricula=" + matricula + ", marca=" + marca + ", modelo=" + modelo + ", numOcupantes=" + numOcupantes + ", numParcela=" + numParcela + ", checkIn=" + checkIn + ", checkOut=" + checkOut + "}";
     }
-
-    
-    
-    
-    
-    
+   
 }

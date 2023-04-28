@@ -111,8 +111,17 @@ public class Cliente {
     public String toSQL(){
         ConexionBBDD conexion = new ConexionBBDD();
         String insertCliente = "INSERT INTO clientes (dni, nombre, apellido1, apellido2, fecha_nac, nacionalidad, telefono, mail, matricula)"
-                + "VALUES ('"+getDni()+"','"+getNombre()+"','"+getApellido1()+"','"+getApellido2()+"','"
-                + conexion.fechaSQL(getFechaNac())+"','"+getNacionalidad()+"',"+getTelefono()+",'"+getMail()+"','"+getMatriculaAuto()+"');";
+                + "VALUES ('"+getDni()+"','"+getNombre()+"','"+getApellido1()+"','"+getApellido2()+"',";
+
+        if (getFechaNac() == null) {
+            insertCliente += conexion.fechaSQL(getFechaNac())+",'";
+        }
+        else {
+            insertCliente += "'" + conexion.fechaSQL(getFechaNac())+"','";
+        }
+
+            insertCliente += getNacionalidad()+"',"+getTelefono()+",'"+getMail()+"','"+getMatriculaAuto()+"');";
+            
         return insertCliente;
     }
 

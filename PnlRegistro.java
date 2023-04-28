@@ -5,6 +5,7 @@
 package pantallasSwing;
 
 import clasesJava.Alerta;
+import clasesJava.AlertaVehiculo;
 import clasesJava.Cliente;
 import clasesJava.Interfaz;
 import clasesJava.ConexionBBDD;
@@ -12,68 +13,149 @@ import clasesJava.Vehiculo;
 import java.awt.Color;
 import java.sql.SQLException;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
+
+/* En este panel se pueden registrar los vehiculos y sus ocupantes, que se ingresarán en la BD, se habilita el ingreso de tantos
+ocupantes como hayamos marcado al ingresar el vehiculo*/
 
 public class PnlRegistro extends javax.swing.JPanel {
     
     ConexionBBDD conexion = new ConexionBBDD();
-    Set <Cliente> clientes = new HashSet<>();
+    private Color camposNull = new Color(255,0,51);
     Vehiculo vehiculo;
     Alerta alerta;
-    int contador = 2; //Contador para cambiar label de clientes
+    int contadorCliente; //Contador para cambiar lbl clientes
 
     public PnlRegistro() {
         initComponents();
-        setSize(1300,700); //Da el tamaño a la ventana
-        setLocation(0,0);
         configInicial();
+        contadorCliente = 1;
+    }
+    
+    public boolean comprobacionDatosCliente() {
+                
+        boolean datosCorrectos = true;
+        
+        tfDNI.setBackground(Color.white);
+        tfNombre.setBackground(Color.white);
+        tfApellido1.setBackground(Color.white);
+        tfTelefono.setBackground(Color.white);
+        
+        if (tfDNI.getText().isBlank()) {
+            tfDNI.setBackground(Color.red);
+            datosCorrectos = false;
+        }
+        
+        if (tfNombre.getText().isBlank()) {
+            tfNombre.setBackground(Color.red);
+            datosCorrectos = false;
+        }
+        
+        if (tfApellido1.getText().isBlank()) {
+            tfApellido1.setBackground(Color.red);
+            datosCorrectos = false;
+        }
+        
+        if (tfTelefono.getText().isBlank()) {
+            tfTelefono.setBackground(Color.red);
+            datosCorrectos = false;
+        }
+        
+        Pattern patternInteger = Pattern.compile("\\d+");
+        
+        if (!patternInteger.matcher(tfTelefono.getText()).matches()) {
+            tfTelefono.setBackground(Color.red);
+            datosCorrectos = false;
+        }
+        
+        return datosCorrectos;
+    }
+    
+    public boolean comprobacionDatosVehiculo() {
+        
+        boolean datosCorrectos = true;
+        
+        tfMatricula.setBackground(Color.white);
+        dcCheckIn.setBackground(Color.white);
+        dcCheckOut.setBackground(Color.white);
+                
+        if (tfMatricula.getText().isBlank()) {
+            tfMatricula.setBackground(Color.red);
+            datosCorrectos = false;
+        }
+        
+        Date checkin = dcCheckIn.getDate();
+        Date checkout = dcCheckOut.getDate();
+        
+        if (checkin == null) {
+            dcCheckIn.setBackground(Color.red);
+            datosCorrectos = false;
+        }
+        
+        if (checkout == null) {
+            dcCheckOut.setBackground(Color.red);
+            datosCorrectos = false;
+        }
+        
+        if (checkin != null && checkout != null) {
+            if (checkout.before(checkin)) {
+                dcCheckOut.setBackground(Color.red);
+                datosCorrectos = false;
+            }
+        }
+
+        return datosCorrectos;
     }
     
     //se instancia un nuevo vehículo con los datos de los campos
     public Vehiculo crearVehiculo(){
-        vehiculo = new Vehiculo();
-        vehiculo.setMatricula(tfMatricula.getText());
-        vehiculo.setMarca(tfMarca.getText());
-        vehiculo.setModelo(tfModelo.getText());
-        vehiculo.setNumParcela(Integer.parseInt(cbParcela.getSelectedItem().toString()));
-        //El siguiente bloque hace que al asignar una parcela al vehículo esta cambie su estado a ocupado
-        try {
-            conexion.UpdateBd("UPDATE parcelas SET disponibilidad=false WHERE num_parcela ="+vehiculo.getNumParcela()+";");
-        }catch (SQLException ex) {
-            Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
+        if (comprobacionDatosVehiculo()) {
+            vehiculo = new Vehiculo();
+            vehiculo.setMatricula(tfMatricula.getText());
+            vehiculo.setMarca(tfMarca.getText());
+            vehiculo.setModelo(tfModelo.getText());
+            vehiculo.setNumParcela(Integer.parseInt(cbParcela.getSelectedItem().toString()));
+            vehiculo.setCheckIn(dcCheckIn.getDate());
+            vehiculo.setCheckOut(dcCheckOut.getDate());
+            vehiculo.setNumOcupantes(Integer.parseInt(cbOcupantes.getSelectedItem().toString())); //parseo el objeto recogido por el comboBox a int
         }
-        vehiculo.setCheckIn(dcCheckIn.getDate());
-        vehiculo.setCheckOut(dcCheckOut.getDate());
-        vehiculo.setTituloAlerta("Salida del vehículo "+vehiculo.getMatricula());
-        vehiculo.setNumOcupantes(Integer.parseInt(cbOcupantes.getSelectedItem().toString())); //parseo el objeto recogido por el comboBox a int
+        else { 
+            vehiculo = null;
+        }
         return vehiculo;
     }
     
     //Método para crear un nuevo cliente con los datos del cuestionario
     public Cliente crearCliente(){
+        
         Cliente cliente = new Cliente();
-        cliente.setDni(tfDNI.getText());
-        cliente.setNacionalidad(tfNacionalidad.getText());
-        cliente.setNombre(tfNombre.getText());
-        cliente.setApellido1(tfApellido1.getText());
-        cliente.setApellido2(tfApellido2.getText());
-        cliente.setFechaNac(dcFechaNac.getDate());
-        cliente.setTelefono(Integer.parseInt(tfTelefono.getText()));
-        cliente.setMail(tfMail.getText());
-        cliente.setMatriculaAuto(tfMatricula.getText());
-        return cliente;
+        
+        if (comprobacionDatosCliente()) {  // Si los datos son correctos
+            cliente.setDni(tfDNI.getText());
+            cliente.setNacionalidad(tfNacionalidad.getText());
+            cliente.setNombre(tfNombre.getText());
+            cliente.setApellido1(tfApellido1.getText());
+            cliente.setApellido2(tfApellido2.getText());
+            cliente.setFechaNac(dcFechaNac.getDate());
+            cliente.setTelefono(Integer.parseInt(tfTelefono.getText()));
+            cliente.setMail(tfMail.getText());
+            cliente.setMatriculaAuto(tfMatricula.getText());
+        }
+        else {
+            cliente = null;
+        }
+        return cliente; 
     }
     
     //Método para cambiar del frame Clientes al de vehiculos cuando ya se hayan introducido todos
     public void cambiarPnl(){
-        if ((contador-1) >= vehiculo.getNumOcupantes()){
             configInicial();
-            JOptionPane.showMessageDialog(null, "Todos los clientes del vehículo " +vehiculo.getMatricula()+" han sido guardados" );
-            
             tfMatricula.setEnabled(true);
             tfMarca.setEnabled(true);
             tfModelo.setEnabled(true);
@@ -83,25 +165,22 @@ public class PnlRegistro extends javax.swing.JPanel {
             cbParcela.setEnabled(true);
 
             //Limpio todos los campos de la interfaz
-            tfMatricula.setText(null);
-            tfMarca.setText(null);
-            tfModelo.setText(null);
+            tfMatricula.setText("");
+            tfMarca.setText("");
+            tfModelo.setText("");
             dcCheckIn.setDate(null);
             dcCheckOut.setDate(null);
             cbOcupantes.setSelectedIndex(0);
-            cbParcela.setSelectedIndex(0);
-            
-        }
-       
+            cbParcela.setSelectedIndex(0);          
+             
     }
-    
+      
     private void configInicial(){
         pnlClientes.setVisible(false);
         tfMatricula.setBackground(Color.white);
         try {
             String[] datosComboBox;
-            int numRegistros = conexion.contarFilas("SELECT COUNT(*) FROM parcelas where disponibilidad = true;");
-            datosComboBox = conexion.selectFromTabla("select num_parcela from parcelas where disponibilidad = true;",numRegistros);
+            datosComboBox = conexion.selectFromTabla("SELECT num_parcela FROM parcelas WHERE disponibilidad = true;");
             cbParcela.removeAllItems();
             for (int i = 0; i < (datosComboBox.length); i++) {
             cbParcela.addItem(datosComboBox[i]); 
@@ -161,12 +240,6 @@ public class PnlRegistro extends javax.swing.JPanel {
         lblDNI.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblDNI.setText("DNI/ID:");
         pnlClientes.add(lblDNI, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 100, -1, -1));
-
-        tfDNI.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfDNIActionPerformed(evt);
-            }
-        });
         pnlClientes.add(tfDNI, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 90, 140, 30));
 
         lblNacionalidad.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
@@ -204,7 +277,9 @@ public class PnlRegistro extends javax.swing.JPanel {
         pnlClientes.add(lblMail, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 450, -1, -1));
         pnlClientes.add(tfMail, new org.netbeans.lib.awtextra.AbsoluteConstraints(180, 440, 230, 30));
 
+        btnGuardarCliente.setBackground(new java.awt.Color(0, 0, 0));
         btnGuardarCliente.setFont(new java.awt.Font("Rockwell Nova", 1, 16)); // NOI18N
+        btnGuardarCliente.setForeground(new java.awt.Color(255, 255, 255));
         btnGuardarCliente.setText("Guardar cliente");
         btnGuardarCliente.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnGuardarCliente.addActionListener(new java.awt.event.ActionListener() {
@@ -216,6 +291,7 @@ public class PnlRegistro extends javax.swing.JPanel {
 
         lblCliente.setFont(new java.awt.Font("Rockwell Nova", 1, 16)); // NOI18N
         lblCliente.setText("Cliente 1:");
+        lblCliente.setToolTipText("");
         pnlClientes.add(lblCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 100, 100, -1));
 
         lblTitulo.setFont(new java.awt.Font("Rockwell Nova", 0, 18)); // NOI18N
@@ -234,12 +310,6 @@ public class PnlRegistro extends javax.swing.JPanel {
         lblMarca.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
         lblMarca.setText("Marca:");
         pnlVehiculos.add(lblMarca, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 170, -1, -1));
-
-        tfMatricula.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                tfMatriculaActionPerformed(evt);
-            }
-        });
         pnlVehiculos.add(tfMatricula, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 110, 210, 30));
         pnlVehiculos.add(tfMarca, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 160, 210, 30));
 
@@ -262,11 +332,6 @@ public class PnlRegistro extends javax.swing.JPanel {
         cbOcupantes.setMaximumSize(new java.awt.Dimension(70, 20));
         cbOcupantes.setMinimumSize(new java.awt.Dimension(70, 20));
         cbOcupantes.setPreferredSize(new java.awt.Dimension(70, 20));
-        cbOcupantes.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbOcupantesActionPerformed(evt);
-            }
-        });
         pnlVehiculos.add(cbOcupantes, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 460, 90, 30));
 
         lblOcupantes.setFont(new java.awt.Font("Rockwell Nova", 0, 16)); // NOI18N
@@ -280,14 +345,11 @@ public class PnlRegistro extends javax.swing.JPanel {
         cbParcela.setMaximumSize(new java.awt.Dimension(70, 20));
         cbParcela.setMinimumSize(new java.awt.Dimension(70, 20));
         cbParcela.setPreferredSize(new java.awt.Dimension(70, 20));
-        cbParcela.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbParcelaActionPerformed(evt);
-            }
-        });
         pnlVehiculos.add(cbParcela, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 460, 80, 30));
 
+        btnGuardarVehiculo.setBackground(new java.awt.Color(0, 0, 0));
         btnGuardarVehiculo.setFont(new java.awt.Font("Rockwell Nova", 1, 16)); // NOI18N
+        btnGuardarVehiculo.setForeground(new java.awt.Color(255, 255, 255));
         btnGuardarVehiculo.setText("Guardar vehiculo");
         btnGuardarVehiculo.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnGuardarVehiculo.addActionListener(new java.awt.event.ActionListener() {
@@ -305,99 +367,89 @@ public class PnlRegistro extends javax.swing.JPanel {
         add(pnlVehiculos, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 970, 670));
     }// </editor-fold>//GEN-END:initComponents
 
-    private void tfDNIActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfDNIActionPerformed
-
-    }//GEN-LAST:event_tfDNIActionPerformed
-
     private void btnGuardarClienteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarClienteActionPerformed
-        // TODO add your handling code here:
-        //Al pulsa boton guardar en cliente, se instancia un nuevo cliente con los datos de los campos
-        //se añade al set ClientesEnVehiculo y este nuevo set se añade al objeto vehículo
+        //Comprobación de campos vacíos. 
+        
+            Cliente cliente = crearCliente();
+            
+            if (cliente != null) {
+                try {
+                    conexion.updateBd(cliente.toSQL());
+                    
+                    lblCliente.setText("Cliente "+(contadorCliente+1)+":");
+                    
+                    tfDNI.setText("");
+                    tfNombre.setText("");
+                    tfApellido1.setText("");
+                    tfApellido2.setText("");
+                    tfNacionalidad.setText("");
+                    dcFechaNac.setDate(null);
+                    tfTelefono.setText("");
+                    tfMail.setText("");
 
-        //o hago una consulta a la BD para obtener nº de ocupantes y con eso relleno variable
-        Cliente cliente = crearCliente();
-        if(tfDNI.getText().length()==0|tfNombre.getText().length()==0|tfApellido1.getText().length()==0|tfTelefono.getText().length()==0){
-            tfMatricula.setBackground(Color.red);
-            tfNombre.setBackground(Color.red);
-            tfApellido1.setBackground(Color.red);
-            tfTelefono.setBackground(Color.red);
-            JOptionPane.showMessageDialog(null,"Por favor rellene los campos obligatorios");
-        }else{
-            tfMatricula.setBackground(Color.white);
-            tfNombre.setBackground(Color.white);
-            tfApellido1.setBackground(Color.white);
-            tfTelefono.setBackground(Color.white);
-            tfMatricula.setBackground(Color.white);
-            clientes.add(cliente);
-            lblCliente.setText("Cliente "+contador);
-            System.out.println("matricula: "+vehiculo.getMatricula());
-            cambiarPnl();
-            contador ++;
-
-            try {
-                conexion.UpdateBd(cliente.toSQL());
-            } catch (SQLException ex) {
-                Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
-                System.out.println("fallo al insertar el vehiculo en la BD");
+                    if ((contadorCliente) >= vehiculo.getNumOcupantes()){
+                        cambiarPnl();
+                        JOptionPane.showMessageDialog(null,"El vehiculo "+vehiculo.getMatricula()+" y todos sus ocupantes han sido guardados correctamente");
+                    }
+                    contadorCliente++;
+                    
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(this, "El cliente no ha podido añadirse");
+                }
+                
             }
-
-            //Limpio todos los campos de la interfaz
-            tfDNI.setText(null);
-            tfNacionalidad.setText(null);
-            tfNombre.setText(null);
-            tfApellido1.setText(null);
-            tfApellido2.setText(null);
-            dcFechaNac.setDate(null);
-            tfTelefono.setText(null);
-            tfMail.setText(null);
-        }
+            else {
+                JOptionPane.showMessageDialog(this, "Compruebe los datos.");
+            }
+        
     }//GEN-LAST:event_btnGuardarClienteActionPerformed
-
-    private void tfMatriculaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_tfMatriculaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_tfMatriculaActionPerformed
-
-    private void cbOcupantesActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbOcupantesActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cbOcupantesActionPerformed
-
-    private void cbParcelaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbParcelaActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cbParcelaActionPerformed
 
     private void btnGuardarVehiculoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarVehiculoActionPerformed
         // TODO add your handling code here:
-        ConexionBBDD connection = new ConexionBBDD();
-        Calendar calendario = Calendar.getInstance();
         vehiculo = crearVehiculo();
-        if(tfMatricula.getText().length()==0){
-            tfMatricula.setBackground(Color.red);
-            JOptionPane.showMessageDialog(null,"Por favor rellene los campos obligatorios");
-        }else if(dcCheckOut.getDate().before(calendario.getTime()) ){
-            JOptionPane.showMessageDialog(null,"Introduzca una fecha de check-out válida");
-        }else{
-            tfMatricula.setBackground(Color.white);
-            alerta = new Alerta(vehiculo.getTituloAlerta(),"Alerta automática",vehiculo.getCheckOut());
+        
+        if (vehiculo != null) { // Si los datos son correctos
+
+            alerta = new Alerta("Salida del vehiculo "+vehiculo.getMatricula(),"Alerta automatica",vehiculo.getCheckOut());
+            
             try {
-                connection.UpdateBd(alerta.toSQL());
-                connection.UpdateBd(vehiculo.toSQL());
-                JOptionPane.showMessageDialog(null,"Se ha cargado el vehiculo correctamente");
+                
+                // Guardo el vehículo
+                conexion.updateBd(vehiculo.toSQL());
+                
+                // Si el vehículo se guarda bien, bloqueo campos de vehículo y activo los del cliente                
+                pnlClientes.setVisible(true);
+                tfMatricula.setEnabled(false);
+                tfMarca.setEnabled(false);
+                tfModelo.setEnabled(false);
+                dcCheckIn.setEnabled(false);
+                dcCheckOut.setEnabled(false);
+                cbOcupantes.setEnabled(false);
+                cbParcela.setEnabled(false);
+                
+                try {
+                    // Guardo la alerta
+                    conexion.updateBd(alerta.toSQL());//Cambiar orden si cambio FK, poner esta linea despues de update vehiculo
+                    AlertaVehiculo alertaVehiculo = new AlertaVehiculo(vehiculo.getMatricula(), alerta.getTitulo());
+                    conexion.updateBd(alertaVehiculo.toSQL());
+                    // Actualizo disponibilidad de la parcela
+                    conexion.updateBd("UPDATE parcelas SET disponibilidad = false WHERE num_parcela ="+vehiculo.getNumParcela()+";");
+                } catch (SQLException ex) {
+                    JOptionPane.showMessageDialog(this, "No se ha podido añadir la alerta del vehículo");
+                }
+                
             } catch (SQLException ex) {
-                Logger.getLogger(Interfaz.class.getName()).log(Level.SEVERE, null, ex);
-                System.out.println("fallo al insertar el vehiculo en la BD");
+                if (ex.getMessage().toLowerCase().contains("duplicate")) { // Si el mensaje es entrada duplicada, es porque se repite la matrícula
+                    JOptionPane.showMessageDialog(this, "La matrícula ya está en el sistema.");
+                }
+                else {
+                    JOptionPane.showMessageDialog(this, "No se ha podido añadir el vehículo");
+                }
             }
-
-            System.out.println(vehiculo.toString());
-
-            //Desabilita los componentes al introducir el vehiculo y habilita el panel Clientes
-            pnlClientes.setVisible(true);
-            tfMatricula.setEnabled(false);
-            tfMarca.setEnabled(false);
-            tfModelo.setEnabled(false);
-            dcCheckIn.setEnabled(false);
-            dcCheckOut.setEnabled(false);
-            cbOcupantes.setEnabled(false);
-            cbParcela.setEnabled(false);
+            
+        }
+        else{ 
+            JOptionPane.showMessageDialog(this, "Compruebe los datos.");
         }
     }//GEN-LAST:event_btnGuardarVehiculoActionPerformed
 

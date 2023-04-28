@@ -6,7 +6,6 @@ package pantallasSwing;
 
 import clasesJava.Alerta;
 import clasesJava.ConexionBBDD;
-import clasesJava.Interfaz;
 import java.awt.Color;
 import java.sql.SQLException;
 import java.util.Calendar;
@@ -15,33 +14,42 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
+import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
+
+/*En este panel se pueden añadir nuevas alertas para que el programa las muestre en los días indicados. 
+Las alertas que figuran como alertas automáticas en las tablas se generan al ingresar un nuevo vehiculo*/
 
 public class PnlAlertas extends javax.swing.JPanel {
     
     ConexionBBDD conexion = new ConexionBBDD();
     Calendar calendario = Calendar.getInstance();
+    DefaultTableModel dtmHoy;
+    DefaultTableModel dtmManiana;
+    DefaultTableModel dtmSiguientes;
     
     public PnlAlertas() {
         initComponents(); 
-        setSize(1300,700); //Da el tamaño a la ventana
-        setLocation(0,0);
         configInicial();    
     }
     
     private void configInicial(){
         //Declaración de variables
-        DefaultTableModel dtmHoy = new DefaultTableModel();
-        DefaultTableModel dtmManiana = new DefaultTableModel();
-        DefaultTableModel dtmSiguientes = new DefaultTableModel();
+        dtmHoy = new DefaultTableModel();
+        dtmManiana = new DefaultTableModel();
+        dtmSiguientes = new DefaultTableModel();
         String [] cabecera = {"Titulo","Descripción"};
         String [] cabecera2 = {"Titulo","Descripción","Día"};
         Date fechaHoy = calendario.getTime();
         Date fechaManiana = new Date(fechaHoy.getTime() + TimeUnit.DAYS.toMillis(1));
         String fechaHoySQL = conexion.fechaSQL(fechaHoy);
         String fechaManianaSQL = conexion.fechaSQL(fechaManiana);
+        
         //Configuración tablas alertas
         pnlNuevaAlerta.setVisible(false);
+        tblHoy.setDefaultEditor(Object.class, null);
+        tblManiana.setDefaultEditor(Object.class, null);
+        tblSiguientes.setDefaultEditor(Object.class, null);
         tblHoy.setRowHeight(20);
         tblManiana.setRowHeight(20);
         tblSiguientes.setRowHeight(20);
@@ -57,17 +65,83 @@ public class PnlAlertas extends javax.swing.JPanel {
         dtmSiguientes.setRowCount(0);
         //Conexión con BD, muestra datos BD en Jtable
         try {
-           // conexion.UpdateBd("DELETE FROM alertas WHERE dia_alerta < '"+fechaHoySQL+"';");
             conexion.selectFromTabla("SELECT titulo, descripcion FROM alertas WHERE dia_alerta LIKE '"+fechaHoySQL+"';", dtmHoy);
             conexion.selectFromTabla("SELECT titulo, descripcion FROM alertas WHERE dia_alerta LIKE '"+fechaManianaSQL+"';", dtmManiana);
             conexion.selectFromTabla("SELECT titulo, descripcion, dia_alerta FROM alertas WHERE dia_alerta > '"+fechaManianaSQL+"';", dtmSiguientes);
         } catch (SQLException ex) {
             Logger.getLogger(PnlAlertas.class.getName()).log(Level.SEVERE, null, ex);
-            
+            JOptionPane.showMessageDialog(this, "No se han podido recuperar los datos de las alertas.");
         }
     }
     
-  
+     public boolean comprobacionDatosAlerta() {
+                
+        boolean datosCorrectos = true;
+        
+        tfTituloAlerta.setBackground(Color.white);
+        dcDiaAlerta.setBackground(Color.white);
+
+        if (tfTituloAlerta.getText().isBlank()) {
+            tfTituloAlerta.setBackground(Color.red);
+            datosCorrectos = false;
+        }
+        
+        Date diaAlerta = dcDiaAlerta.getDate();
+        
+        if (diaAlerta == null) {
+            dcDiaAlerta.setBackground(Color.red);
+            datosCorrectos = false;
+        }else if (diaAlerta.before(calendario.getTime())){
+            dcDiaAlerta.setBackground(Color.red);
+            datosCorrectos = false;
+        }
+
+        return datosCorrectos;
+    }
+    
+    //Método que genera una nueva alerta con los campos que rellena el usuario
+    public Alerta nuevaAlerta(){
+        Alerta alerta;
+        if (comprobacionDatosAlerta()){
+            alerta = new Alerta(tfTituloAlerta.getText(),taDescripcionAlerta.getText(),dcDiaAlerta.getDate());
+        }else{
+            alerta = null;
+        }
+        return alerta;
+    }
+    
+    public void eliminarAlerta(JTable tabla, DefaultTableModel dtm){
+        int filaSeleccionada = tabla.getSelectedRow();
+            String id = tabla.getValueAt(filaSeleccionada, 0).toString();
+            Object[] opciones = { "ACEPTAR", "CANCELAR" };
+            int opcion = JOptionPane.showOptionDialog(null, "Se eliminarán los datos", "Confirmación",JOptionPane.DEFAULT_OPTION, JOptionPane.WARNING_MESSAGE, null, opciones, opciones[0]);
+            if (opcion == 0){ //ACEPTAR
+                String sentenciaSQL = "DELETE FROM alertas WHERE "+dtm.getColumnName(0)+ "=?;";
+                    try {  
+                        conexion.updateBd(sentenciaSQL,id);
+                    } catch (SQLException ex) {
+                        Logger.getLogger(PnlAlertas.class.getName()).log(Level.SEVERE, null, ex);
+                        JOptionPane.showMessageDialog(this, "No se ha podido eliminar la alerta.");
+                    }
+            }
+    }
+    
+    public void eliminarFila(){
+        if (tblHoy.getSelectedRow() < 0 & tblManiana.getSelectedRow() < 0 & tblSiguientes.getSelectedRow() < 0){
+            JOptionPane.showMessageDialog(this,"Selecciona una alerta");
+        }
+        else{
+            if (tblHoy.getSelectedRow() < 0);
+            else eliminarAlerta(tblHoy, dtmHoy);
+            if (tblManiana.getSelectedRow() < 0);
+            else eliminarAlerta(tblManiana, dtmManiana);
+            if (tblSiguientes.getSelectedRow() < 0);
+            else eliminarAlerta(tblSiguientes, dtmSiguientes);
+        }
+        
+              
+    } 
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -95,6 +169,7 @@ public class PnlAlertas extends javax.swing.JPanel {
         jLabel11 = new javax.swing.JLabel();
         btnGuardar = new javax.swing.JButton();
         dcDiaAlerta = new com.toedter.calendar.JDateChooser();
+        jButton1 = new javax.swing.JButton();
 
         setBackground(new java.awt.Color(0, 153, 204));
 
@@ -212,6 +287,16 @@ public class PnlAlertas extends javax.swing.JPanel {
         pnlNuevaAlerta.add(btnGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 400, 96, 30));
         pnlNuevaAlerta.add(dcDiaAlerta, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 110, 240, -1));
 
+        jButton1.setBackground(new java.awt.Color(255, 0, 51));
+        jButton1.setFont(new java.awt.Font("Rockwell Nova", 0, 12)); // NOI18N
+        jButton1.setForeground(new java.awt.Color(255, 255, 255));
+        jButton1.setText("Eliminar alerta");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -224,10 +309,12 @@ public class PnlAlertas extends javax.swing.JPanel {
                     .addGroup(layout.createSequentialGroup()
                         .addGap(38, 38, 38)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(pnlNuevaAlerta, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(27, 27, 27)
-                                .addComponent(btnNuevaAlerta, javax.swing.GroupLayout.PREFERRED_SIZE, 143, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addComponent(pnlNuevaAlerta, javax.swing.GroupLayout.PREFERRED_SIZE, 320, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addComponent(btnNuevaAlerta, javax.swing.GroupLayout.PREFERRED_SIZE, 130, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)))
                         .addGap(34, 34, 34)
                         .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 561, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -240,7 +327,9 @@ public class PnlAlertas extends javax.swing.JPanel {
                 .addGap(12, 12, 12)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(btnNuevaAlerta, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(btnNuevaAlerta, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addGap(15, 15, 15)
                         .addComponent(pnlNuevaAlerta, javax.swing.GroupLayout.PREFERRED_SIZE, 490, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 592, javax.swing.GroupLayout.PREFERRED_SIZE)))
@@ -248,36 +337,47 @@ public class PnlAlertas extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnGuardarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnGuardarActionPerformed
-        //Se verifica que el campo fecha sea posterior a la fecha de hoy y se crea una nueva alerta
-        if (dcDiaAlerta.getDate().before(calendario.getTime()) ){
-            JOptionPane.showMessageDialog(null,"Introduzca una fecha válida");
-        }else{
-            Alerta alerta = new Alerta(tfTituloAlerta.getText(),taDescripcionAlerta.getText(),dcDiaAlerta.getDate());
-            try {
-                conexion.UpdateBd(alerta.toSQL());
-                JOptionPane.showMessageDialog(null,"Se ha añadido la nueva alerta");
+        Alerta alerta = nuevaAlerta();
+        
+        if(alerta != null) { // Si los datos son correctos
+        
+        try {
+                conexion.updateBd(alerta.toSQL());
+                JOptionPane.showMessageDialog(this,"Se ha añadido la nueva alerta");
                 pnlNuevaAlerta.setVisible(false);
+                tfTituloAlerta.setText(null);
+                dcDiaAlerta.setDate(null);
+                taDescripcionAlerta.setText(null);
+                configInicial();
             } catch (SQLException ex) {
-                Logger.getLogger(PnlAlertas.class.getName()).log(Level.SEVERE, null, ex);
-                JOptionPane.showMessageDialog(null,"Ha ocurrido un error al añadir la alerta");
+                if (ex.getMessage().toLowerCase().contains("duplicate")) { // Si el mensaje es entrada duplicada, es porque se repite la matrícula
+                    JOptionPane.showMessageDialog(this, "Ya existe una alerta con ese título");
+                }
+                else {
+                    JOptionPane.showMessageDialog(this, "No se ha podido añadir la alerta");
+                }
             }
-            tfTituloAlerta.setText(null);
-            dcDiaAlerta.setDate(null);
-            taDescripcionAlerta.setText(null);
-            configInicial();
+        } else{
+            JOptionPane.showMessageDialog(this, "Compruebe los datos.");
         }
     }//GEN-LAST:event_btnGuardarActionPerformed
 
     private void btnNuevaAlertaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnNuevaAlertaActionPerformed
-        if (pnlNuevaAlerta.isVisible())pnlNuevaAlerta.setVisible(false);
+        if (pnlNuevaAlerta.isVisible()) pnlNuevaAlerta.setVisible(false);
         else pnlNuevaAlerta.setVisible(true);  
     }//GEN-LAST:event_btnNuevaAlertaActionPerformed
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        eliminarFila();
+        configInicial();
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnGuardar;
     private javax.swing.JButton btnNuevaAlerta;
     private com.toedter.calendar.JDateChooser dcDiaAlerta;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
